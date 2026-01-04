@@ -81,8 +81,8 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                     <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--card-bg)', backdropFilter: 'blur(10px)' }}>
                         <tr>
                             <th style={{ width: '130px' }}>วันที่</th>
-                            <th style={{ minWidth: '150px' }}>คนขับ</th>
-                            <th style={{ minWidth: '200px' }}>สายงาน</th>
+                            <th style={{ minWidth: '120px' }}>คนขับ</th>
+                            <th style={{ minWidth: '130px' }}>สายงาน</th>
                             <th>ค่าเที่ยว (+)</th>
                             <th>ค่าน้ำมัน (-)</th>
                             <th>ค่าจ้าง (-)</th>
