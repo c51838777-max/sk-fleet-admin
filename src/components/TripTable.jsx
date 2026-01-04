@@ -17,7 +17,7 @@ const TripTable = ({ trips, onDelete, onEdit, onExport }) => {
                     <thead>
                         <tr>
                             <th>วันที่</th>
-                            <th>สายงาน</th>
+                            <th style={{ minWidth: '200px' }}>สายงาน</th>
                             <th>ค่าเที่ยว (+)</th>
                             <th>ค่าน้ำมัน (-)</th>
                             <th>ค่าจ้าง (-)</th>

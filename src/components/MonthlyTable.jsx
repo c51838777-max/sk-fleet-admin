@@ -81,8 +81,8 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                     <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: 'var(--card-bg)', backdropFilter: 'blur(10px)' }}>
                         <tr>
                             <th style={{ width: '130px' }}>วันที่</th>
-                            <th>คนขับ</th>
-                            <th>สายงาน</th>
+                            <th style={{ minWidth: '150px' }}>คนขับ</th>
+                            <th style={{ minWidth: '200px' }}>สายงาน</th>
                             <th>ค่าเที่ยว (+)</th>
                             <th>ค่าน้ำมัน (-)</th>
                             <th>ค่าจ้าง (-)</th>
@@ -200,7 +200,7 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <ReceiptText size={20} color="var(--primary)" /> ออกสลิปเงินเดือนพนักงาน
                 </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '1.25rem' }}>
                     {(() => {
                         const tripsInPeriod = datesInRange.flatMap(date => {
                             const y = date.getFullYear();
@@ -227,7 +227,7 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                             }, 1000) - cn;
 
                             return (
-                                <div key={name} className="glass-card" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div key={name} className="glass-card" style={{ padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', border: '1px solid rgba(255,255,255,0.05)' }}>
                                     <div>
                                         <p style={{ fontWeight: '600', marginBottom: '0.25rem' }}>{name}</p>
                                         <p style={{ fontSize: '0.75rem', color: 'var(--success)' }}>ยอดสุทธิ: ฿{totalPay.toLocaleString()}</p>
