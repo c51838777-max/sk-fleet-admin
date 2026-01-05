@@ -1,0 +1,16 @@
+{
+    "short_name": "SK ADMIN",
+    "name": "SK FLEET SOLUTIONS - ADMIN",
+    "icons": [
+        {
+            "src": "app-icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "start_url": "/",
+    "display": "standalone",
+    "theme_color": "#002a16",
+    "background_color": "#000000"
+}
