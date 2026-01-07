@@ -1,6 +1,6 @@
 {
-    "short_name": "SK FLEET",
-    "name": "SK FLEET SOLUTIONS",
+    "short_name": "Patta Fleet",
+    "name": "Patta Fleet Solution",
     "icons": [
         {
             "src": "app-icon.png",
@@ -11,6 +11,6 @@
     ],
     "start_url": ".",
     "display": "standalone",
-    "theme_color": "#0f172a",
-    "background_color": "#020617"
+    "theme_color": "#1e293b",
+    "background_color": "#0f172a"
 }
