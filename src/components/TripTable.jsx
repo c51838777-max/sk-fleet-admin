@@ -46,8 +46,8 @@ const TripTable = ({ trips, onDelete, onEdit, onExport }) => {
                                     <td style={{ color: 'var(--danger)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                                             <span>{parseFloat(trip.fuel).toLocaleString()} ฿</span>
-                                            {trip.fuel_bill_url && (
-                                                <a href={trip.fuel_bill_url} target="_blank" rel="noreferrer" title="กดดูรูปน้ำมัน" className="bill-icon-btn">
+                                            {(trip.fuel_bill_url || trip.fuel_url) && (
+                                                <a href={trip.fuel_bill_url || trip.fuel_url} target="_blank" rel="noreferrer" title="กดดูรูปน้ำมัน" className="bill-icon-btn">
                                                     <Camera size={16} />
                                                 </a>
                                             )}
@@ -57,8 +57,8 @@ const TripTable = ({ trips, onDelete, onEdit, onExport }) => {
                                     <td style={{ color: 'var(--danger)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                                             <span>{parseFloat(trip.maintenance || 0).toLocaleString()} ฿</span>
-                                            {trip.maintenance_bill_url && (
-                                                <a href={trip.maintenance_bill_url} target="_blank" rel="noreferrer" title="กดดูรูปค่าซ่อม" className="bill-icon-btn">
+                                            {(trip.maintenance_bill_url || trip.maintenance_url) && (
+                                                <a href={trip.maintenance_bill_url || trip.maintenance_url} target="_blank" rel="noreferrer" title="กดดูรูปค่าซ่อม" className="bill-icon-btn">
                                                     <Camera size={16} />
                                                 </a>
                                             )}
@@ -68,8 +68,8 @@ const TripTable = ({ trips, onDelete, onEdit, onExport }) => {
                                     <td style={{ color: 'var(--success)' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                                             <span>+{parseFloat(trip.basket || 0).toLocaleString()} ฿</span>
-                                            {trip.basket_bill_url && (
-                                                <a href={trip.basket_bill_url} target="_blank" rel="noreferrer" title="กดดูรูปตะกร้า" className="bill-icon-btn">
+                                            {(trip.basket_bill_url || trip.basket_url) && (
+                                                <a href={trip.basket_bill_url || trip.basket_url} target="_blank" rel="noreferrer" title="กดดูรูปตะกร้า" className="bill-icon-btn">
                                                     <Camera size={16} />
                                                 </a>
                                             )}

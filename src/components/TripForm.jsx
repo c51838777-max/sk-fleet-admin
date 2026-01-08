@@ -279,10 +279,11 @@ const TripForm = ({ onAdd, onUpdate, uploadFile, routePresets, fetchPresets, ext
                                 {(fuelFile || formData.fuel_bill_url) && (
                                     <button
                                         type="button"
-                                        className="preview-btn-mini"
+                                        className="preview-btn-premium"
                                         onClick={() => window.open(fuelFile ? URL.createObjectURL(fuelFile) : formData.fuel_bill_url, '_blank')}
+                                        title="คลิกเพื่อดูรูปน้ำมัน"
                                     >
-                                        ดูรูป
+                                        <Camera size={12} /> ดูรูป
                                     </button>
                                 )}
                             </div>
@@ -306,10 +307,11 @@ const TripForm = ({ onAdd, onUpdate, uploadFile, routePresets, fetchPresets, ext
                                 {(maintFile || formData.maintenance_bill_url) && (
                                     <button
                                         type="button"
-                                        className="preview-btn-mini"
+                                        className="preview-btn-premium"
                                         onClick={() => window.open(maintFile ? URL.createObjectURL(maintFile) : formData.maintenance_bill_url, '_blank')}
+                                        title="คลิกเพื่อดูรูปค่าซ่อม"
                                     >
-                                        ดูรูป
+                                        <Camera size={12} /> ดูรูป
                                     </button>
                                 )}
                             </div>
@@ -333,10 +335,11 @@ const TripForm = ({ onAdd, onUpdate, uploadFile, routePresets, fetchPresets, ext
                                 {(basketFile || formData.basket_bill_url) && (
                                     <button
                                         type="button"
-                                        className="preview-btn-mini"
+                                        className="preview-btn-premium"
                                         onClick={() => window.open(basketFile ? URL.createObjectURL(basketFile) : formData.basket_bill_url, '_blank')}
+                                        title="คลิกเพื่อดูรูปตะกร้า"
                                     >
-                                        ดูรูป
+                                        <Camera size={12} /> ดูรูป
                                     </button>
                                 )}
                             </div>
@@ -443,6 +446,9 @@ const TripForm = ({ onAdd, onUpdate, uploadFile, routePresets, fetchPresets, ext
                 .input-field-premium label { display: flex; align-items: center; gap: 3px; font-size: 9.5px; font-weight: 700; color: var(--text-dim); margin: 0; }
                 .input-premium-compact { background: rgba(0,0,0,0.2) !important; border: 1px solid rgba(255,255,255,0.06) !important; border-radius: 6px !important; padding: 4px 8px !important; color: white !important; font-size: 11px !important; font-weight: 600 !important; height: 28px; }
                 .input-premium-compact:focus { border-color: var(--primary) !important; background: rgba(255,255,255,0.03) !important; }
+                
+                .preview-btn-premium { background: rgba(45, 212, 191, 0.15); border: 1px solid rgba(45, 212, 191, 0.4); color: #2dd4bf; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s; }
+                .preview-btn-premium:hover { background: #2dd4bf; color: #0f172a; box-shadow: 0 0 10px rgba(45, 212, 191, 0.4); }
                 
                 .save-btn-premium { 
                     background: linear-gradient(135deg, var(--primary), var(--accent)); 

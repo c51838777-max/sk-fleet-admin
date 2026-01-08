@@ -45,9 +45,9 @@ const normalizeTrip = (t) => {
         basket,
         basketCount: parseInt(t.basket_count || t.basketCount || 0),
         basketShare, staffShare, profit,
-        fuel_bill_url: t.fuel_bill_url || null,
-        maintenance_bill_url: t.maintenance_bill_url || null,
-        basket_bill_url: t.basket_bill_url || null
+        fuel_bill_url: t.fuel_bill_url || t.fuel_url || t.fuelUrl || null,
+        maintenance_bill_url: t.maintenance_bill_url || t.maintenance_url || t.maintenanceUrl || null,
+        basket_bill_url: t.basket_bill_url || t.basket_url || t.basketUrl || null
     };
 };
 

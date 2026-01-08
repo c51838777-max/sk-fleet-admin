@@ -512,6 +512,19 @@ const DriverEntry = () => {
                                             <p>{trip.date} • {trip.driverName}</p>
                                         </div>
                                         <div className="item-actions">
+                                            {(trip.fuel_bill_url || trip.maintenance_bill_url || trip.basket_bill_url) && (
+                                                <div style={{ display: 'flex', gap: '4px', marginRight: '8px' }}>
+                                                    {trip.fuel_bill_url && (
+                                                        <a href={trip.fuel_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปน้ำมัน"><Camera size={14} /></a>
+                                                    )}
+                                                    {trip.maintenance_bill_url && (
+                                                        <a href={trip.maintenance_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปค่าซ่อม"><Camera size={14} /></a>
+                                                    )}
+                                                    {trip.basket_bill_url && (
+                                                        <a href={trip.basket_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปตะกร้า"><Camera size={14} /></a>
+                                                    )}
+                                                </div>
+                                            )}
                                             <button onClick={() => handleEdit(trip)} className="icon-btn-edit">
                                                 <Edit size={16} />
                                             </button>
