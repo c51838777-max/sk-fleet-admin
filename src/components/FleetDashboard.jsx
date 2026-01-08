@@ -1,135 +1,234 @@
 import React from 'react';
-import { Truck, DollarSign, Fuel, Users, CreditCard, ShoppingCart, Settings, Wallet, Banknote } from 'lucide-react';
+import { Truck, DollarSign, Fuel, Users, CreditCard, ShoppingCart, Settings, Wallet, Banknote, Undo2 } from 'lucide-react';
 
-const StatCard = ({ title, value, icon: Icon, color }) => (
-    <div className="glass-card stat-card fade-in">
-        <div className={`stat-icon ${color}`}>
-            <Icon size={24} />
-        </div>
-        <div className="stat-content">
-            <p className="stat-title">{title}</p>
-            <h3 className="stat-value">{value}</h3>
-        </div>
-    </div>
-);
-
-const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], children }) => {
-    const [viewType, setViewType] = React.useState('monthly'); // 'monthly' or 'yearly'
-
-    const currentStats = viewType === 'monthly' ? stats : {
-        ...yearlyStats,
-        totalWages: 0,
-        totalBasket: 0,
-        totalStaffAdvance: 0,
-        totalDriverAdvance: 0,
-        totalRemainingPay: 0
+const StatCard = ({ title, value, icon: _Icon, color, subValue }) => {
+    const getColorClass = () => {
+        switch (color) {
+            case 'blue': return 'bg-blue-soft text-blue-deep';
+            case 'red': return 'bg-white text-danger-bold';
+            case 'orange': return 'bg-white text-warning-bold';
+            case 'purple': return 'bg-purple-soft text-purple-deep';
+            case 'green': return 'bg-green-soft text-green-deep';
+            default: return 'bg-white text-main-dark';
+        }
     };
 
     return (
-        <div className="dashboard-container">
-            <header className="dashboard-header">
-                <div className="logo-section flex flex-col items-start bg-transparent">
-                    <h1 className="brand-logo" style={{ fontSize: '2.5rem' }}>SK FLEET</h1>
-                    <p className="brand-subtitle" style={{ fontSize: '12px' }}>SOLUTIONS</p>
-                </div>
-                <div className="date-display" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div className={`status-badge ${isSupabaseReady ? 'online' : 'offline'}`} style={{
-                        fontSize: '10px',
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        background: isSupabaseReady ? 'rgba(45, 212, 191, 0.1)' : 'rgba(244, 63, 94, 0.1)',
-                        color: isSupabaseReady ? '#2dd4bf' : '#f43f5e',
-                        border: `1px solid ${isSupabaseReady ? 'rgba(45, 212, 191, 0.2)' : 'rgba(244, 63, 94, 0.2)'}`,
-                        fontWeight: 'bold',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                    }}>
-                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }} />
-                        {isSupabaseReady ? `CLOUD SYNC ONLINE (${trips.length} รายการ)` : 'LOCAL STORAGE ONLY'}
-                    </div>
-                    <div className="glass-card" style={{ padding: '0.25rem', display: 'flex', gap: '0.25rem' }}>
-                        <button
-                            className={`btn ${viewType === 'monthly' ? 'btn-primary' : 'btn-outline'}`}
-                            onClick={() => setViewType('monthly')}
-                            style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}
-                        >
-                            รายเดือน
-                        </button>
-                        <button
-                            className={`btn ${viewType === 'yearly' ? 'btn-primary' : 'btn-outline'}`}
-                            onClick={() => setViewType('yearly')}
-                            style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}
-                        >
-                            รายปี
-                        </button>
-                    </div>
-                    {new Date().toLocaleDateString('th-TH', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    })}
-                </div>
-            </header>
+        <div className={`summary-card-mini ${getColorClass()} fade-in`}>
+            <div className="card-top">
+                <_Icon size={12} className="card-icon" />
+                <span className="card-title">{title}</span>
+            </div>
+            <div className="card-value">
+                {typeof value === 'number' ? `฿${Math.floor(value).toLocaleString()}` : value}
+                {subValue && <span className="sub-value"> {subValue}</span>}
+            </div>
+        </div>
+    );
+};
 
-            <div className="stats-grid">
-                <StatCard
-                    title={viewType === 'monthly' ? "จำนวนเที่ยวเดือนนี้" : "จำนวนเที่ยวปีนี้"}
-                    value={`${currentStats.totalTrips} เที่ยว`}
-                    icon={Truck}
-                    color="blue"
-                />
-                <StatCard
-                    title={viewType === 'monthly' ? "รายได้เดือนนี้" : "รายได้ปีนี้"}
-                    value={`฿${currentStats.totalRevenue.toLocaleString()}`}
-                    icon={DollarSign}
-                    color="var(--success)"
-                />
-                <StatCard
-                    title={viewType === 'monthly' ? "ค่าน้ำมันเดือนนี้" : "ค่าน้ำมันปีนี้"}
-                    value={`฿${currentStats.totalFuel.toLocaleString()}`}
-                    icon={Fuel}
-                    color="red"
-                />
-                <StatCard
-                    title={viewType === 'monthly' ? "ค่าซ่อมเดือนนี้" : "ค่าซ่อมปีนี้"}
-                    value={`฿${currentStats.totalMaintenance.toLocaleString()}`}
-                    icon={Settings}
-                    color="red-intense"
-                />
-                <StatCard
-                    title={viewType === 'monthly' ? "กําไรสุทธิเดือนนี้" : "กําไรสุทธิปีนี้"}
-                    value={`฿${currentStats.totalProfit.toLocaleString()}`}
-                    icon={CreditCard}
-                    color="indigo"
-                />
-                {viewType === 'monthly' && (
-                    <>
-                        <StatCard
-                            title="ยอดเบิกลูกน้อง"
-                            value={`฿${currentStats.totalStaffAdvance.toLocaleString()}`}
-                            icon={Users}
-                            color="warning"
-                        />
-                        <StatCard
-                            title="คงเหลือจ่ายสุทธิ (คนขับ)"
-                            value={`฿${currentStats.totalRemainingPay.toLocaleString()}`}
-                            icon={Banknote}
-                            color="blue"
-                        />
-                    </>
-                )}
+const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], currentMonth, currentYear, viewType, setViewType, children, isMaximized }) => {
+    const currentStats = viewType === 'monthly' ? stats : yearlyStats;
+
+    const monthNames = [
+        'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+        'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+
+    return (
+        <div className="dashboard-container">
+
+
+            <div className="summary-section-premium">
+                <div className="section-header">
+                    <ShoppingCart size={16} />
+                    <span>สรุปผลประกอบการประจำรอบ ({monthNames[currentMonth]} {currentYear + 543})</span>
+                </div>
+
+                <div className="summary-grid-fixed">
+
+                    <StatCard
+                        title="รายได้ทั้งหมด"
+                        value={currentStats.totalRevenue}
+                        icon={Wallet}
+                        color="blue"
+                    />
+                    <StatCard
+                        title="ค่าเที่ยว"
+                        value={currentStats.totalPrice}
+                        icon={Banknote}
+                        color="white"
+                    />
+                    <StatCard
+                        title="ค่าแรง"
+                        value={currentStats.totalWage}
+                        icon={Users}
+                        color="white"
+                    />
+                    <StatCard
+                        title="ค่าตะกร้า"
+                        value={currentStats.totalBasket}
+                        icon={ShoppingCart}
+                        color="white"
+                    />
+                    <StatCard
+                        title="ส่วนแบ่งตะกร้า"
+                        value={currentStats.totalBasketShare}
+                        icon={ShoppingCart}
+                        color="red"
+                    />
+                    <StatCard
+                        title="ค่าน้ำมัน"
+                        value={currentStats.totalFuel}
+                        icon={Fuel}
+                        color="red"
+                    />
+                    <StatCard
+                        title="ค่าซ่อมบำรุง"
+                        value={currentStats.totalMaintenance}
+                        icon={Settings}
+                        color="red"
+                    />
+                    <StatCard
+                        title="ยอดเบิก"
+                        value={currentStats.totalStaffAdvance}
+                        icon={Wallet}
+                        color="orange"
+                    />
+                    <StatCard
+                        title="คงเหลือน้อง"
+                        value={currentStats.totalNetPay}
+                        icon={CreditCard}
+                        color="purple"
+                    />
+                    <StatCard
+                        title="กำไรสุทธิ"
+                        value={currentStats.totalProfit}
+                        icon={DollarSign}
+                        color="green"
+                    />
+                </div>
             </div>
 
-            <main className="dashboard-content">
+            <main className="dashboard-content" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                 {viewType === 'monthly' ? children : (
-                    <div className="glass-card fade-in" style={{ padding: '3rem', textAlign: 'center', marginTop: '2rem' }}>
-                        <h2 style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>📊 สรุปภาพรวมรายปี {new Date().getFullYear() + 543}</h2>
-                        <p style={{ color: 'var(--text-muted)' }}>เลือกโหมด "รายเดือน" หากต้องการบันทึกข้อมูลหรือดูรายละเอียดแยกตามวัน</p>
+                    <div className="glass-card fade-in" style={{ padding: '3rem', textAlign: 'center', marginTop: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+                        <div>
+                            <h2 style={{ color: 'var(--text-dim)', marginBottom: '0.5rem' }}>📊 สรุปภาพรวมรายปี {currentYear + 543}</h2>
+                            <p style={{ color: 'var(--text-dim)', opacity: 0.7 }}>สถิติรวมของปีนี้ทั้งหมดแสดงอยู่ในการ์ดสรุปด้านบนแล้ว</p>
+                        </div>
+                        <button
+                            className="btn-secondary-premium"
+                            onClick={() => setViewType('monthly')}
+                            style={{ padding: '0.75rem 2rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                        >
+                            <Undo2 size={18} />
+                            <span>กลับไปหน้าตารางรายเดือน</span>
+                        </button>
                     </div>
                 )}
             </main>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .dashboard-container { 
+                    min-height: 100vh;
+                    height: ${isMaximized ? 'auto' : '100vh'}; 
+                    display: flex; 
+                    flex-direction: column; 
+                    overflow: ${isMaximized ? 'visible' : 'hidden'}; 
+                    background: #020617;
+                    padding: 1.5rem;
+                    perspective: 2000px; /* Base for 3D */
+                }
+                .dashboard-header-premium { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+                .brand-logo { font-size: 2.2rem; font-weight: 900; letter-spacing: 4px; color: #fff; margin:0; line-height:1; }
+                .brand-subtitle { font-size: 10px; letter-spacing: 8px; color: var(--primary); margin: 5px 0 0 0; font-weight: 700; }
+                
+                .header-right { display: flex; align-items: center; gap: 1rem; }
+                .status-pill { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); }
+                .status-pill.online { color: #2dd4bf; border-color: rgba(45, 212, 191, 0.2); }
+                .status-pill.online .dot { width: 6px; height: 6px; background: #2dd4bf; border-radius: 50%; box-shadow: 0 0 10px #2dd4bf; }
+                
+                .view-switcher-glass { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 4px; border-radius: 12px; display: flex; gap: 4px; }
+                .switch-btn { padding: 6px 16px; border: none; background: none; color: var(--text-dim); cursor: pointer; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
+                .switch-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3); }
+                
+                .current-date-badge { background: rgba(129, 140, 248, 0.1); color: var(--primary); padding: 8px 16px; border-radius: 12px; font-weight: 800; font-size: 13px; border: 1px solid rgba(129, 140, 248, 0.2); }
+
+                .summary-section-premium { flex-shrink: 0; margin-bottom: 1.5rem; }
+                .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; color: var(--text-dim); font-size: 13px; font-weight: 700; padding-left: 5px; }
+                
+                .summary-grid-fixed { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; padding-top: 5px; }
+                .summary-grid-fixed::-webkit-scrollbar { height: 4px; }
+                .summary-grid-fixed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+                .summary-card-mini { 
+                    flex: 0 0 135px; 
+                    padding: 15px 12px; 
+                    border-radius: 16px; 
+                    display: flex; 
+                    flex-direction: column; 
+                    gap: 6px; 
+                    box-shadow: 
+                        0 10px 20px -5px rgba(0,0,0,0.4),
+                        0 4px 6px -2px rgba(0,0,0,0.2),
+                        inset 0 1px 1px rgba(255,255,255,0.1);
+                    min-height: 85px;
+                    justify-content: center;
+                    transform-style: preserve-3d;
+                    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+                }
+                .card-top { display: flex; align-items: center; gap: 6px; }
+                .card-title { font-size: 10px; font-weight: 700; opacity: 0.8; white-space: nowrap; }
+                .card-value { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; }
+                .sub-value { font-size: 11px; opacity: 0.8; }
+
+                /* Dark Theme Premium Styles */
+                .bg-white { background: rgba(255, 255, 255, 0.03); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.05); }
+                .bg-blue-soft { background: rgba(56, 189, 248, 0.08); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+                .bg-purple-soft { background: rgba(168, 85, 247, 0.08); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.2); }
+                .bg-green-soft { background: rgba(34, 197, 94, 0.08); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+                
+                .text-blue-deep { color: #38bdf8 !important; }
+                .text-danger-bold { color: #f43f5e !important; }
+                .text-warning-bold { color: #f59e0b !important; }
+                .text-purple-deep { color: #a855f7 !important; }
+                .text-green-deep { color: #22c55e !important; }
+                .text-main-dark { color: var(--text-main) !important; }
+
+                .summary-card-mini { 
+                    backdrop-filter: blur(10px);
+                    transition: all 0.3s ease;
+                }
+                .summary-card-mini:hover {
+                    transform: translateY(-8px) translateZ(10px) rotateX(2deg) rotateY(-1deg);
+                    background: rgba(255, 255, 255, 0.08);
+                    box-shadow: 
+                        0 25px 50px -12px rgba(0,0,0,0.7),
+                        0 15px 20px -5px rgba(0,0,0,0.5);
+                }
+
+                @media (max-width: 1024px) {
+                    .dashboard-container {
+                        height: auto !important;
+                        overflow: visible !important;
+                        padding: 1rem;
+                    }
+                }
+
+                @media (max-width: 1300px) {
+                    .summary-grid-fixed { flex-wrap: wrap; }
+                    .summary-card-mini { flex: 1 1 calc(20% - 10px); min-width: 120px; }
+                }
+                @media (max-width: 768px) {
+                    .summary-card-mini { flex: 1 1 calc(33.33% - 10px); }
+                }
+                @media (max-width: 480px) {
+                    .summary-card-mini { flex: 1 1 calc(50% - 10px); }
+                }
+                `
+            }} />
         </div>
     );
 };

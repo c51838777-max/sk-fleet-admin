@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, Edit2, Download } from 'lucide-react';
+import { Trash2, Edit2, Download, Camera } from 'lucide-react';
 
 const TripTable = ({ trips, onDelete, onEdit, onExport }) => {
     return (
@@ -43,15 +43,43 @@ const TripTable = ({ trips, onDelete, onEdit, onExport }) => {
                                     <td>{new Date(trip.date).toLocaleDateString('th-TH')}</td>
                                     <td style={{ fontWeight: '500' }}>{trip.route}</td>
                                     <td>{parseFloat(trip.price).toLocaleString()} ฿</td>
-                                    <td style={{ color: 'var(--danger)' }}>-{parseFloat(trip.fuel).toLocaleString()} ฿</td>
+                                    <td style={{ color: 'var(--danger)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                            <span>{parseFloat(trip.fuel).toLocaleString()} ฿</span>
+                                            {trip.fuel_bill_url && (
+                                                <a href={trip.fuel_bill_url} target="_blank" rel="noreferrer" title="กดดูรูปน้ำมัน" className="bill-icon-btn">
+                                                    <Camera size={16} />
+                                                </a>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td style={{ color: 'var(--danger)' }}>-{parseFloat(trip.wage).toLocaleString()} ฿</td>
-                                    <td style={{ color: 'var(--danger)' }}>-{parseFloat(trip.maintenance || 0).toLocaleString()} ฿</td>
+                                    <td style={{ color: 'var(--danger)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                            <span>{parseFloat(trip.maintenance || 0).toLocaleString()} ฿</span>
+                                            {trip.maintenance_bill_url && (
+                                                <a href={trip.maintenance_bill_url} target="_blank" rel="noreferrer" title="กดดูรูปค่าซ่อม" className="bill-icon-btn">
+                                                    <Camera size={16} />
+                                                </a>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td style={{ color: 'var(--warning-intense)' }}>-{parseFloat(trip.advance || 0).toLocaleString()} ฿</td>
-                                    <td style={{ color: 'var(--success)' }}>+{parseFloat(trip.basket || 0).toLocaleString()} ฿</td>
+                                    <td style={{ color: 'var(--success)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                                            <span>+{parseFloat(trip.basket || 0).toLocaleString()} ฿</span>
+                                            {trip.basket_bill_url && (
+                                                <a href={trip.basket_bill_url} target="_blank" rel="noreferrer" title="กดดูรูปตะกร้า" className="bill-icon-btn">
+                                                    <Camera size={16} />
+                                                </a>
+                                            )}
+                                        </div>
+                                    </td>
+
                                     <td style={{ color: 'var(--danger)' }}>-{parseFloat(trip.basketShare || 0).toLocaleString()} ฿</td>
                                     <td style={{ color: 'var(--warning)' }}>-{parseFloat(trip.staffShare || 0).toLocaleString()} ฿</td>
                                     <td>
-                                        <span className="badge badge-profit">
+                                        <span className={`badge ${trip.profit >= 0 ? 'badge-profit' : 'badge-loss'}`}>
                                             {Math.round(trip.profit).toLocaleString()} ฿
                                         </span>
                                     </td>

@@ -1,6 +1,6 @@
 {
-    "short_name": "SK ADMIN",
-    "name": "SK FLEET SOLUTIONS - ADMIN",
+    "short_name": "Patta Fleet",
+    "name": "Patta Fleet Solution",
     "icons": [
         {
             "src": "app-icon.png",
@@ -9,8 +9,8 @@
             "purpose": "any maskable"
         }
     ],
-    "start_url": "/",
+    "start_url": ".",
     "display": "standalone",
-    "theme_color": "#002a16",
-    "background_color": "#000000"
+    "theme_color": "#1e293b",
+    "background_color": "#0f172a"
 }

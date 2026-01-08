@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import DriverEntry from './pages/DriverEntry';
 import './index.css';
@@ -30,10 +30,10 @@ function App() {
     <ErrorBoundary>
       <Router>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<DriverEntry />} />
           <Route path="/driver" element={<DriverEntry />} />
-          {/* Fallback to Dashboard */}
-          <Route path="*" element={<Dashboard />} />
+          <Route path="/admin" element={<Dashboard />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </ErrorBoundary>
