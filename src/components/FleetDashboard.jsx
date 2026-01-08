@@ -112,19 +112,22 @@ const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], curre
 
             <main className="dashboard-content" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                 {viewType === 'monthly' ? children : (
-                    <div className="glass-card fade-in" style={{ padding: '3rem', textAlign: 'center', marginTop: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
-                        <div>
-                            <h2 style={{ color: 'var(--text-dim)', marginBottom: '0.5rem' }}>📊 สรุปภาพรวมรายปี {currentYear + 543}</h2>
-                            <p style={{ color: 'var(--text-dim)', opacity: 0.7 }}>สถิติรวมของปีนี้ทั้งหมดแสดงอยู่ในการ์ดสรุปด้านบนแล้ว</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '100%' }}>
+                        <div className="glass-card fade-in" style={{ padding: '3rem', textAlign: 'center', marginTop: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+                            <div>
+                                <h2 style={{ color: 'var(--text-dim)', marginBottom: '0.5rem' }}>📊 สรุปภาพรวมรายปี {currentYear + 543}</h2>
+                                <p style={{ color: 'var(--text-dim)', opacity: 0.7 }}>สถิติรวมของปีนี้ทั้งหมดแสดงอยู่ในการ์ดสรุปด้านบนแล้ว</p>
+                            </div>
+                            <button
+                                className="btn-secondary-premium"
+                                onClick={() => setViewType('monthly')}
+                                style={{ padding: '0.75rem 2rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+                            >
+                                <Undo2 size={18} />
+                                <span>กลับไปหน้าตารางรายเดือน</span>
+                            </button>
                         </div>
-                        <button
-                            className="btn-secondary-premium"
-                            onClick={() => setViewType('monthly')}
-                            style={{ padding: '0.75rem 2rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}
-                        >
-                            <Undo2 size={18} />
-                            <span>กลับไปหน้าตารางรายเดือน</span>
-                        </button>
+                        {children}
                     </div>
                 )}
             </main>

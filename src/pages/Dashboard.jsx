@@ -41,7 +41,7 @@ const Dashboard = () => {
         const headers = ["วันที่", "คนขับ", "สายงาน", "ค่าเที่ยว", "น้ำมัน", "ค่าจ้าง", "ค่าซ่อม", "จำนวนตะกร้า", "ค่าตะกร้า", "ส่วนแบ่งตะกร้า", "ยอดเบิก", "กำไร"];
         const csvContent = [
             headers.join(","),
-            ...currentMonthTripsEnriched.map(t => [
+            ...(currentMonthTripsEnriched || []).map(t => [
                 t.date,
                 `"${t.driverName}"`,
                 `"${t.route}"`,
