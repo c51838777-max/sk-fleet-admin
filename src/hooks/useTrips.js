@@ -293,17 +293,26 @@ export const useTrips = () => {
         if (isSupabaseReady) {
             // Updated mapping to match standard columns
             const payload = {
-                ...baseData,
+                date: trip.date || getLocalDate(),
+                route: (trip.route || '').trim(),
                 driver_name: driverName,
-                advance: staffShare,
-                staff_share: basketShare,
-                basket_count: basketCount
+                price: p(trip.price),
+                fuel: p(trip.fuel),
+                wage: p(trip.wage),
+                basket: p(trip.basket),
+                maintenance: p(trip.maintenance),
+                advance: p(trip.staffShare), // staffShare -> advance (Yod Berk)
+                staff_share: p(trip.basketShare), // basketShare -> staff_share (Basket Split)
+                basket_count: parseInt(trip.basketCount) || 0,
+                fuel_bill_url: trip.fuel_bill_url || null,
+                maintenance_bill_url: trip.maintenance_bill_url || null,
+                basket_bill_url: trip.basket_bill_url || null
             };
 
             const { data, error } = await supabase.from('trips').insert([payload]).select();
             if (error) {
                 console.error("Insert error:", error);
-                return { success: false, error };
+                throw error; // Let the UI catch it
             }
 
             if (data?.[0]) {
@@ -344,9 +353,27 @@ export const useTrips = () => {
         const staffShare = p(updatedData.staffShare); const basketShare = p(updatedData.basketShare); const basketCount = parseInt(updatedData.basketCount) || 0;
 
         if (isSupabaseReady) {
-            const payload = { ...baseData, driver_name: driverName, advance: staffShare, staff_share: basketShare, basket_count: basketCount };
+            const payload = {
+                date: updatedData.date,
+                route: (updatedData.route || '').trim(),
+                driver_name: driverName,
+                price: p(updatedData.price),
+                fuel: p(updatedData.fuel),
+                wage: p(updatedData.wage),
+                basket: p(updatedData.basket),
+                maintenance: p(updatedData.maintenance),
+                advance: p(updatedData.staffShare),
+                staff_share: p(updatedData.basketShare),
+                basket_count: parseInt(updatedData.basketCount) || 0,
+                fuel_bill_url: updatedData.fuel_bill_url || null,
+                maintenance_bill_url: updatedData.maintenance_bill_url || null,
+                basket_bill_url: updatedData.basket_bill_url || null
+            };
             const { error } = await supabase.from('trips').update(payload).eq('id', id);
-            if (error) return { success: false, error };
+            if (error) {
+                console.error("Update error:", error);
+                throw error;
+            }
             setTrips(prev => prev.map(t => t.id === id ? normalizeTrip({ ...payload, id }) : t));
             return { success: true };
         } else {
@@ -362,15 +389,15 @@ export const useTrips = () => {
             const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
             const filePath = `${fileName}`;
 
-            console.log(`Uploading to bills/${bucket}/${filePath}...`);
-            const { error: uploadError } = await supabase.storage.from('bills').upload(`${bucket}/${filePath}`, file);
+            console.log(`Uploading to bucket "${bucket}"...`);
+            const { error: uploadError } = await supabase.storage.from(bucket).upload(filePath, file);
 
             if (uploadError) {
-                console.error(`Upload failed to bucket "bills":`, uploadError.message, uploadError);
+                console.error(`Upload failed to bucket "${bucket}":`, uploadError.message, uploadError);
                 return null;
             }
 
-            const { data: { publicUrl } } = supabase.storage.from('bills').getPublicUrl(`${bucket}/${filePath}`);
+            const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(filePath);
             console.log(`Upload success! Public URL: ${publicUrl}`);
             return publicUrl;
         } catch (err) {
