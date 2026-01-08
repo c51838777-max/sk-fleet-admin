@@ -362,15 +362,15 @@ export const useTrips = () => {
             const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
             const filePath = `${fileName}`;
 
-            console.log(`Uploading to BILLS/${bucket}/${filePath}...`);
-            const { error: uploadError } = await supabase.storage.from('BILLS').upload(`${bucket}/${filePath}`, file);
+            console.log(`Uploading to bills/${bucket}/${filePath}...`);
+            const { error: uploadError } = await supabase.storage.from('bills').upload(`${bucket}/${filePath}`, file);
 
             if (uploadError) {
-                console.error(`Upload failed to bucket "BILLS":`, uploadError.message, uploadError);
+                console.error(`Upload failed to bucket "bills":`, uploadError.message, uploadError);
                 return null;
             }
 
-            const { data: { publicUrl } } = supabase.storage.from('BILLS').getPublicUrl(`${bucket}/${filePath}`);
+            const { data: { publicUrl } } = supabase.storage.from('bills').getPublicUrl(`${bucket}/${filePath}`);
             console.log(`Upload success! Public URL: ${publicUrl}`);
             return publicUrl;
         } catch (err) {
