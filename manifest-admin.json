@@ -1,6 +1,6 @@
 {
-    "short_name": "Patta Transport",
-    "name": "Patta Transport",
+    "short_name": "แอดมินภัทธา",
+    "name": "แอดมิน - ตารางค่าเที่ยว (PATTA)",
     "icons": [
         {
             "src": "icon-192.png",
@@ -15,7 +15,7 @@
             "purpose": "any maskable"
         }
     ],
-    "start_url": "/#/",
+    "start_url": "/#/admin",
     "display": "standalone",
     "theme_color": "#1e293b",
     "background_color": "#0f172a"
