@@ -111,10 +111,10 @@ const Dashboard = () => {
             <div className="header-flex-premium" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
                     <div className="logo-group" style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                        <img src="/logo-premium.png" alt="Patta Fleet Logo" style={{ height: '75px', width: 'auto', borderRadius: '14px', boxShadow: '0 10px 20px rgba(0,0,0,0.3)' }} />
+                        <img src="/mainlogo.png?v=JAN9" alt="ภัทธา ทรานสปอร์ต Logo" style={{ height: '80px', width: 'auto', borderRadius: '16px', boxShadow: '0 12px 24px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.1)' }} />
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <h1 className="brand-logo" style={{ fontSize: '2rem', margin: 0, lineHeight: '1.1' }}>Patta Fleet</h1>
-                            <p className="brand-subtitle" style={{ margin: 0, letterSpacing: '0.6em', fontSize: '11px' }}>SOLUTION</p>
+                            <h1 className="brand-logo" style={{ fontSize: '1.6rem', margin: 0, lineHeight: '1.2', fontWeight: '900' }}>ภัทธา ทรานสปอร์ต</h1>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', letterSpacing: '3px', fontWeight: '800' }}>PATTA TRANSPORT</span>
                         </div>
                     </div>
 
@@ -354,10 +354,19 @@ const Dashboard = () => {
                 
                 @media (max-width: 1200px) {
                     .admin-main-grid { flex-direction: column; height: auto; display: flex; }
-                    .admin-form-col { width: 100%; flex: none; order: 1; height: auto; }
-                    .admin-form-col > form { height: auto !important; overflow: visible !important; }
-                    .admin-table-col { width: 100%; flex: none; order: 2; margin-top: 1rem; height: auto !important; }
+                    .admin-form-col { width: 100%; flex: none; order: 1; height: auto; padding: 0.5rem; }
+                    .admin-form-col > form { height: auto !important; overflow: visible !important; border-radius: 1.5rem!important; padding: 1.5rem!important; }
+                    .admin-table-col { width: 100%; flex: none; order: 2; margin-top: 1rem; height: auto !important; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+                    .header-flex-premium { padding: 1rem; }
+                    .logo-group img { height: 60px!important; }
+                    .brand-logo { font-size: 1.2rem!important; }
                 }
+                @media (max-width: 480px) {
+                    .admin-main-grid { padding: 0.5rem; }
+                    .stat-card { padding: 1rem; }
+                    .stat-value { font-size: 1.5rem; }
+                }
+
             `}} />
         </FleetDashboard>
     );

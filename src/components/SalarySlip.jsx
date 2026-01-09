@@ -68,10 +68,10 @@ const SalarySlip = ({ driverName, trips, onClose, period, cnDeduction = 0 }) => 
                     <div className="slip-header-premium">
                         <div className="header-brand">
                             <div className="brand-logo-container" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <img src="/logo-premium.png" alt="Logo" style={{ height: '50px', width: 'auto', borderRadius: '8px' }} />
+                                <img src="/mainlogo.png?v=JAN9" alt="Logo" style={{ height: '55px', width: 'auto', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }} />
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    <h1 className="brand-logo" style={{ fontSize: '1.8rem', margin: 0, lineHeight: '1.1' }}>Patta Fleet</h1>
-                                    <p className="brand-subtitle" style={{ margin: 0, letterSpacing: '0.3em', fontSize: '10px' }}>SOLUTION</p>
+                                    <h1 className="brand-logo" style={{ fontSize: '1.3rem', margin: 0, lineHeight: '1.2', fontWeight: '800' }}>ภัทธา ทรานสปอร์ต</h1>
+                                    <span style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 'bold', letterSpacing: '1px' }}>PATTA TRANSPORT</span>
                                 </div>
                             </div>
                             <div className="official-badge">

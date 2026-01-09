@@ -19,7 +19,8 @@ import {
     Wrench,
     Upload,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Camera
 } from 'lucide-react';
 import { getLocalDate } from '../utils/dateUtils';
 import SalarySlip from '../components/SalarySlip';
@@ -219,10 +220,10 @@ const DriverEntry = () => {
                     <div className="brand-group">
 
                         <div className="logo-group" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <img src="/logo-premium.png" alt="Patta Fleet Logo" style={{ height: '65px', width: 'auto', borderRadius: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }} />
+                            <img src="/mainlogo.png?v=JAN9" alt="ภัทธา ทรานสปอร์ต Logo" style={{ height: '75px', width: 'auto', borderRadius: '15px', boxShadow: '0 10px 20px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.1)' }} />
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <h1 className="brand-logo" style={{ fontSize: '1.7rem', margin: 0, lineHeight: '1.1' }}>Patta Fleet</h1>
-                                <p className="brand-subtitle" style={{ margin: 0, letterSpacing: '0.4em', fontSize: '9px' }}>SOLUTION</p>
+                                <h1 className="brand-logo" style={{ fontSize: '1.3rem', margin: 0, lineHeight: '1.2', fontWeight: '800' }}>ภัทธา ทรานสปอร์ต</h1>
+                                <span className="subtitle" style={{ fontSize: '0.7rem', color: 'var(--text-dim)', letterSpacing: '2px', fontWeight: '600' }}>PATTA TRANSPORT</span>
                             </div>
                         </div>
                     </div>
@@ -344,6 +345,18 @@ const DriverEntry = () => {
                                     <option key={route} value={route} />
                                 ))}
                             </datalist>
+                        </div>
+
+
+                        <div className="input-field-premium">
+                            <label><Banknote size={14} /> ค่าจ้าง (บาท)</label>
+                            <input
+                                type="number"
+                                className="input-premium"
+                                placeholder="0"
+                                value={formData.wage}
+                                onChange={(e) => setFormData({ ...formData, wage: e.target.value })}
+                            />
                         </div>
 
                         <div className="input-field-premium">
@@ -503,45 +516,72 @@ const DriverEntry = () => {
 
                     {showHistory && (
                         <div className="history-timeline fade-in">
-                            {trips.filter(t => t.driverName === formData.driverName.trim().replace(/\s+/g, ' ')).slice(0, 10).map((trip) => (
-                                <div key={trip.id} className="timeline-item">
-                                    <div className="timeline-dot"></div>
-                                    <div className="timeline-content">
-                                        <div className="item-main">
-                                            <h4>{trip.route}</h4>
-                                            <p>{trip.date} • {trip.driverName}</p>
-                                        </div>
-                                        <div className="item-actions">
-                                            {(trip.fuel_bill_url || trip.maintenance_bill_url || trip.basket_bill_url) && (
-                                                <div style={{ display: 'flex', gap: '4px', marginRight: '8px' }}>
-                                                    {trip.fuel_bill_url && (
-                                                        <a href={trip.fuel_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปน้ำมัน"><Camera size={14} /></a>
-                                                    )}
-                                                    {trip.maintenance_bill_url && (
-                                                        <a href={trip.maintenance_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปค่าซ่อม"><Camera size={14} /></a>
-                                                    )}
-                                                    {trip.basket_bill_url && (
-                                                        <a href={trip.basket_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปตะกร้า"><Camera size={14} /></a>
-                                                    )}
+                            {(() => {
+                                const searchName = formData.driverName.trim().replace(/\s+/g, ' ').toLowerCase();
+                                const filtered = trips.filter(t => {
+                                    const driverName = (t.driverName || '').trim().replace(/\s+/g, ' ').toLowerCase();
+                                    return searchName ? driverName === searchName : true;
+                                }).slice(0, 10);
+
+                                if (filtered.length > 0) {
+                                    return filtered.map((trip) => (
+                                        <div key={trip.id} className="timeline-item">
+                                            <div className="timeline-dot"></div>
+                                            <div className="timeline-content">
+                                                <div className="item-main">
+                                                    <h4>{trip.route}</h4>
+                                                    <p>{trip.date} • {trip.driverName}</p>
                                                 </div>
-                                            )}
-                                            <button onClick={() => handleEdit(trip)} className="icon-btn-edit">
-                                                <Edit size={16} />
-                                            </button>
-                                            <button onClick={() => handleDelete(trip.id)} className="icon-btn-delete">
-                                                <Trash2 size={16} />
-                                            </button>
+                                                <div className="item-actions">
+                                                    {(trip.fuel_bill_url || trip.maintenance_bill_url || trip.basket_bill_url) && (
+                                                        <div style={{ display: 'flex', gap: '4px', marginRight: '8px' }}>
+                                                            {trip.fuel_bill_url && (
+                                                                <a href={trip.fuel_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปน้ำมัน"><Camera size={14} /></a>
+                                                            )}
+                                                            {trip.maintenance_bill_url && (
+                                                                <a href={trip.maintenance_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปค่าซ่อม"><Camera size={14} /></a>
+                                                            )}
+                                                            {trip.basket_bill_url && (
+                                                                <a href={trip.basket_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปตะกร้า"><Camera size={14} /></a>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <button onClick={() => handleEdit(trip)} className="icon-btn-edit">
+                                                        <Edit size={16} />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(trip.id)} className="icon-btn-delete">
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            ))}
-                            {trips.length === 0 && (
-                                <div className="empty-history">ไม่พบประวัติงานในระบบ</div>
-                            )}
+                                    ));
+                                } else {
+                                    return <div className="empty-history">ไม่พบประวัติงาน{formData.driverName ? `ของคุณ ${formData.driverName}` : ''}</div>;
+                                }
+                            })()}
                         </div>
                     )}
                 </div>
             </main>
+
+            {showSlip && (
+                <SalarySlip
+                    driverName={formData.driverName}
+                    trips={trips.filter(t => {
+                        const searchName = formData.driverName.trim().replace(/\s+/g, ' ');
+                        const startDate = new Date(slipYear, slipMonth - 1, 20);
+                        const endDate = new Date(slipYear, slipMonth, 19);
+                        const [y, m, d] = (t.date || '').split('-').map(Number);
+                        if (!y) return false;
+                        const checkDate = new Date(y, m - 1, d);
+                        return t.driverName === searchName && checkDate >= startDate && checkDate <= endDate;
+                    })}
+                    cnDeduction={cnDeductions[formData.driverName?.trim().replace(/\s+/g, ' ')] || 0}
+                    onClose={() => setShowSlip(false)}
+                    period={`20 ${['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'][(slipMonth - 1 + 12) % 12]} - 19 ${['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'][slipMonth]} ${slipYear}`}
+                />
+            )}
 
             <style dangerouslySetInnerHTML={{
                 __html: `
@@ -608,7 +648,21 @@ const DriverEntry = () => {
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
                 @keyframes pulse { 0% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0.6; transform: scale(1); } }
                 @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-                @media(max-width: 480px) { .driver-landscape { padding: 1rem; } .input-grid-premium { grid-template-columns: 1fr; } .brand-group h1 { font-size: 1.5rem; } }
+                @media(max-width: 480px) { 
+                    .driver-landscape { padding: 0.75rem; } 
+                    .input-grid-premium { grid-template-columns: 1fr; } 
+                    .brand-group h1 { font-size: 1.4rem; }
+                    .driver-premium-header { margin-bottom: 1.5rem; }
+                    .driver-greeting-row { grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+                    .stat-pill { padding: 0.8rem 1rem; }
+                    .stat-pill .value { font-size: 1.1rem; }
+                    .btn-premium { padding: 1.1rem; font-size: 1rem; }
+                    .input-premium { padding: 0.9rem 1rem!important; font-size: 1.1rem!important; }
+                    .logo-group img { height: 60px!important; }
+                    .brand-logo { font-size: 1.1rem!important; }
+                    .subtitle { font-size: 0.6rem!important; }
+                 } 
+
             `}} />
         </div>
     );

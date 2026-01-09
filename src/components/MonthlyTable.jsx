@@ -84,7 +84,7 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                             <th style={{ width: '120px', padding: '0.3rem 0.2rem', textAlign: 'center' }}>วันที่</th>
                             <th style={{ width: '100px', padding: '0.3rem 0.2rem', textAlign: 'left' }}>คนขับ</th>
                             <th style={{ minWidth: '120px', padding: '0.3rem 0.2rem', textAlign: 'left' }}>สายงาน</th>
-                            <th style={{ width: '75px', padding: '0.3rem 0.2rem', textAlign: 'center' }}>ค่าเที่ยว</th>
+                            <th style={{ width: '75px', padding: '0.3rem 0.2rem', textAlign: 'center' }}>ราคาค่าเที่ยว</th>
                             <th style={{ width: '75px', padding: '0.3rem 0.2rem', textAlign: 'center' }}>น้ำมัน</th>
                             <th style={{ width: '75px', padding: '0.3rem 0.2rem', textAlign: 'center' }}>ค่าจ้าง</th>
                             <th style={{ width: '75px', padding: '0.3rem 0.2rem', textAlign: 'center' }}>ค่าซ่อม</th>
@@ -369,7 +369,7 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
                                             <p style={{ fontWeight: '800' }}>฿{(parseFloat(trip.wage) || 0).toLocaleString()}</p>
-                                            <p style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>ค่าเที่ยว: ฿{(parseFloat(trip.price) || 0).toLocaleString()}</p>
+                                            <p style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>ราคาค่าเที่ยว: ฿{(parseFloat(trip.price) || 0).toLocaleString()}</p>
                                         </div>
                                     </div>
                                 ))}

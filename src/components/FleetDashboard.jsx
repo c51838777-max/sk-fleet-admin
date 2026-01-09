@@ -140,9 +140,23 @@ const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], curre
                     display: flex; 
                     flex-direction: column; 
                     overflow: ${isMaximized ? 'visible' : 'hidden'}; 
-                    background: #020617;
+                .dashboard-container { 
+                    min-height: 100vh;
+                    min-height: -webkit-fill-available;
+                    display: flex; 
+                    flex-direction: column; 
+                    overflow: ${isMaximized ? 'visible' : 'hidden'}; 
+                    background-color: #020617;
+                    background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.9)), url('/patta_hero_v4.png');
+                    background-size: cover;
+                    background-position: center;
+                    background-attachment: scroll;
+                    background-repeat: no-repeat;
                     padding: 1.5rem;
-                    perspective: 2000px; /* Base for 3D */
+                    perspective: 2000px;
+                }
+                @media (min-width: 1025px) {
+                    .dashboard-container { background-attachment: fixed; }
                 }
                 .dashboard-header-premium { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
                 .brand-logo { font-size: 2.2rem; font-weight: 900; letter-spacing: 4px; color: #fff; margin:0; line-height:1; }

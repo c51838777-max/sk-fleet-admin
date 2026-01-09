@@ -259,7 +259,7 @@ const TripForm = ({ onAdd, onUpdate, uploadFile, routePresets, fetchPresets, ext
                         />
                     </div>
                     <div className="input-field-premium">
-                        <label><Banknote size={14} /> ค่าเที่ยว (บาท)</label>
+                        <label><Banknote size={14} /> ราคาค่าเที่ยว (บาท)</label>
                         <input
                             type="number"
                             className="input-premium-compact"
@@ -373,7 +373,7 @@ const TripForm = ({ onAdd, onUpdate, uploadFile, routePresets, fetchPresets, ext
                         </datalist>
                     </div>
                     <div className="input-field-premium">
-                        <label><Banknote size={14} /> ค่าจ้างคนขับ</label>
+                        <label><Banknote size={14} /> ค่าจ้าง (บาท)</label>
                         <input
                             type="number"
                             className="input-premium-compact"
