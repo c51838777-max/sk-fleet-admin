@@ -3,7 +3,7 @@
     "name": "ตารางค่าเที่ยววิ่งงาน",
     "icons": [
         {
-            "src": "logo.png",
+            "src": "pattabird.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
