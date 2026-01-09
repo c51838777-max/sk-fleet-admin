@@ -1,15 +1,15 @@
 {
-    "short_name": "Patta Fleet",
-    "name": "Patta Fleet Solution",
+    "short_name": "ภัทธา ทรานสปอร์ต",
+    "name": "ภัทธา ทรานสปอร์ต (PATTA TRANSPORT)",
     "icons": [
         {
-            "src": "app-icon.png",
+            "src": "logo_current.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
         }
     ],
-    "start_url": ".",
+    "start_url": "./",
     "display": "standalone",
     "theme_color": "#1e293b",
     "background_color": "#0f172a"
