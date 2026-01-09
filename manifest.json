@@ -1,9 +1,9 @@
 {
-    "short_name": "ตารางค่าเที่ยว",
-    "name": "ตารางค่าเที่ยววิ่งงาน",
+    "short_name": "ภัทธา",
+    "name": "ภัทธา ทรานสปอร์ต (PATTA TRANSPORT)",
     "icons": [
         {
-            "src": "pattabird.png",
+            "src": "logo_official.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
