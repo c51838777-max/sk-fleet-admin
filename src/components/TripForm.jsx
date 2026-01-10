@@ -217,7 +217,7 @@ const TripForm = ({ onAdd, onUpdate, uploadFile, routePresets, fetchPresets, ext
             <div className="form-header-premium">
                 <h3 className="form-title">
                     <History size={22} className="text-primary" />
-                    เพิ่มรายการใหม่ (DEBUG MODE)
+                    บันทึกข้อมูลกองรถ (Admin)
                 </h3>
             </div>
 

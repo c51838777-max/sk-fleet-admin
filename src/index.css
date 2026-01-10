@@ -51,7 +51,7 @@ body {
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   border-radius: 1.5rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -431,7 +431,7 @@ tr:hover td {
   min-height: 100vh;
   min-height: -webkit-fill-available;
   background-color: #020617;
-  background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.9)), url('/patta_hero_v4.png');
+  background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 0.8)), url('./assets/bg.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

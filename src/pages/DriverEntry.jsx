@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { getLocalDate } from '../utils/dateUtils';
 import SalarySlip from '../components/SalarySlip';
+import { logoBase64 } from '../assets/logoBase64';
+
 
 
 const DriverEntry = () => {
@@ -39,6 +41,16 @@ const DriverEntry = () => {
     const [slipYear, setSlipYear] = useState(new Date().getFullYear());
     const [isUploading, setIsUploading] = useState(false);
     const [files, setFiles] = useState({ fuel: null, maintenance: null, basket: null });
+
+    useEffect(() => {
+        document.title = "Patta Transport";
+        // Dynamic Manifest for Driver
+        const link = document.querySelector("link[rel*='manifest']") || document.createElement('link');
+        link.type = 'application/manifest+json';
+        link.rel = 'manifest';
+        link.href = '/driver.webmanifest?v=2.2';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    }, []);
 
     const [formData, setFormData] = useState({
         driverName: localStorage.getItem('lastDriverName') || '',
@@ -220,7 +232,7 @@ const DriverEntry = () => {
                     <div className="brand-group">
 
                         <div className="logo-group" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <img src="/mainlogo.png?v=JAN9" alt="ภัทธา ทรานสปอร์ต Logo" style={{ height: '75px', width: 'auto', borderRadius: '15px', boxShadow: '0 10px 20px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.1)' }} />
+                            <img src={logoBase64} alt="ภัทธา ทรานสปอร์ต Logo" style={{ height: '90px', width: 'auto', borderRadius: '15px', boxShadow: '0 10px 24px rgba(0,0,0,0.6)', border: '2px solid rgba(255,255,255,0.1)', display: 'block' }} />
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <h1 className="brand-logo" style={{ fontSize: '1.3rem', margin: 0, lineHeight: '1.2', fontWeight: '800' }}>ภัทธา ทรานสปอร์ต</h1>
                                 <span className="subtitle" style={{ fontSize: '0.7rem', color: 'var(--text-dim)', letterSpacing: '2px', fontWeight: '600' }}>PATTA TRANSPORT</span>

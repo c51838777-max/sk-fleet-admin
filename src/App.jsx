@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from './pages/Dashboard';
 import DriverEntry from './pages/DriverEntry';
 import './index.css';
+import InstallPrompt from './components/InstallPrompt';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -35,6 +36,7 @@ function App() {
           <Route path="/admin" element={<Dashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <InstallPrompt />
       </Router>
     </ErrorBoundary>
   );

@@ -5,8 +5,11 @@ import { useTrips } from '../hooks/useTrips';
 import MonthlyTable from '../components/MonthlyTable';
 import TripTable from '../components/TripTable';
 import TripForm from '../components/TripForm';
-import { Truck, ArrowRight, Maximize2, Minimize2 } from 'lucide-react';
+import TripEditModal from '../components/TripEditModal';
+import { Truck, ArrowRight, Maximize2, Minimize2, Plus, ShoppingCart, Wallet, Banknote, Users, Fuel, Settings, CreditCard, DollarSign } from 'lucide-react';
 import FleetDashboard from '../components/FleetDashboard';
+import { logoBase64 } from '../assets/logoBase64';
+
 
 const Dashboard = () => {
     const {
@@ -19,22 +22,37 @@ const Dashboard = () => {
         isSupabaseReady, currentMonthTripsEnriched, uploadFile
     } = useTrips();
 
+    React.useEffect(() => {
+        document.title = "ตารางค่าเที่ยว (Admin)";
+        // Dynamic Manifest for Admin
+        const link = document.querySelector("link[rel*='manifest']") || document.createElement('link');
+        link.type = 'application/manifest+json';
+        link.rel = 'manifest';
+        link.href = '/admin.webmanifest?v=2.2';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    }, []);
+
     const [formDate, setFormDate] = useState(null);
     const [editingTrip, setEditingTrip] = useState(null);
     const [viewMode, setViewMode] = useState('monthly'); // 'monthly' or 'all'
     const [isMaximized, setIsMaximized] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const formRef = useRef(null);
 
     const handleEditTrip = (trip) => {
         setEditingTrip(trip);
-        setTimeout(() => {
-            formRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        setIsModalOpen(true);
     };
 
     const handleUpdateTrip = async (id, updatedData) => {
         await updateTrip(id, updatedData);
         setEditingTrip(null);
+        setIsModalOpen(false);
+    };
+
+    const handleAddTrip = async (data) => {
+        await addTrip(data);
+        setIsModalOpen(false);
     };
 
     const handleExport = () => {
@@ -107,11 +125,12 @@ const Dashboard = () => {
             viewType={viewType}
             setViewType={setViewType}
             isMaximized={isMaximized}
+            hideStats={viewType === 'monthly'}
         >
             <div className="header-flex-premium" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
                     <div className="logo-group" style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                        <img src="/mainlogo.png?v=JAN9" alt="ภัทธา ทรานสปอร์ต Logo" style={{ height: '80px', width: 'auto', borderRadius: '16px', boxShadow: '0 12px 24px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.1)' }} />
+                        <img src={logoBase64} alt="ภัทธา ทรานสปอร์ต Logo" style={{ height: '100px', width: 'auto', borderRadius: '16px', boxShadow: '0 12px 32px rgba(0,0,0,0.6)', border: '2px solid rgba(255,255,255,0.1)', display: 'block' }} />
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <h1 className="brand-logo" style={{ fontSize: '1.6rem', margin: 0, lineHeight: '1.2', fontWeight: '900' }}>ภัทธา ทรานสปอร์ต</h1>
                             <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', letterSpacing: '3px', fontWeight: '800' }}>PATTA TRANSPORT</span>
@@ -154,28 +173,30 @@ const Dashboard = () => {
 
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <button
-                        className={`toggle-btn ${isMaximized ? 'active' : ''}`}
-                        onClick={() => setIsMaximized(!isMaximized)}
+                        className="btn-primary-premium"
+                        onClick={() => {
+                            setEditingTrip(null);
+                            setIsModalOpen(true);
+                        }}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
                             gap: '8px',
-                            background: 'rgba(255,255,255,0.05)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            padding: '8px 16px',
+                            padding: '10px 24px',
                             borderRadius: '12px',
-                            fontSize: '13px',
-                            fontWeight: '700'
+                            fontSize: '14px',
+                            fontWeight: '700',
+                            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)'
                         }}
                     >
-                        {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-                        <span>{isMaximized ? 'ย่อหน้าจอ' : 'ขยายดูยอดลงงานทั้งหมด'}</span>
+                        <Plus size={20} />
+                        <span>เพิ่มรายการใหม่</span>
                     </button>
                 </div>
             </div>
 
-            <div className="admin-main-grid">
-                <div className="admin-table-col">
+            <div className="admin-main-grid" style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
+                <div className="admin-table-col" style={{ flex: '1', minWidth: '0' }}>
                     {viewMode === 'monthly' ? (
                         <MonthlyTable
                             currentMonth={currentMonth}
@@ -188,6 +209,7 @@ const Dashboard = () => {
                             onDeleteTrip={deleteTrip}
                             cnDeductions={cnDeductions}
                             setCnDeductions={setCnDeductions}
+                            showSlips={false} // Don't show slips inside table component
                         />
                     ) : (
                         <TripTable
@@ -199,27 +221,145 @@ const Dashboard = () => {
                     )}
                 </div>
 
-                <div ref={formRef} className="admin-form-col">
-                    <TripForm
-                        onAdd={addTrip}
-                        onUpdate={handleUpdateTrip}
-                        uploadFile={uploadFile}
-                        routePresets={routePresets}
-                        fetchPresets={fetchPresets}
-                        externalDate={formDate}
-                        onDateChange={(val) => setFormDate({ value: val, ts: Date.now() })}
-                        editingTrip={editingTrip}
-                        onCancelEdit={() => setEditingTrip(null)}
-                    />
-                </div>
+                {/* Right Column: Salary Slips (Only visible in Monthly View) */}
+                {viewMode === 'monthly' && (
+                    <div className="admin-slips-col hide-scrollbar" style={{ flex: '0 0 380px', position: 'sticky', top: '1rem', maxHeight: 'calc(100vh - 2rem)', overflowY: 'auto', paddingRight: '4px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                        {/* Stats Section in Right Column */}
+                        <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.25rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)' }}>
+                                <ShoppingCart size={18} /> สรุปผลประกอบการ
+                            </h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                                {/* Revenue */}
+                                <div style={{ gridColumn: '1 / -1', background: 'rgba(56, 189, 248, 0.08)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.8rem', opacity: 0.9, color: '#38bdf8' }}>รายได้รวม</div>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#38bdf8' }}>฿{stats.totalRevenue.toLocaleString()}</div>
+                                </div>
+
+                                {/* Total Price (Ka Tiew) */}
+                                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px' }}>ค่าเที่ยว</div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: '700' }}>฿{stats.totalPrice.toLocaleString()}</div>
+                                </div>
+
+                                {/* Wages */}
+                                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px' }}>ค่าแรง</div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: '700' }}>฿{stats.totalWage.toLocaleString()}</div>
+                                </div>
+
+                                {/* Basket */}
+                                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px' }}>ค่าตะกร้า</div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: '700' }}>฿{stats.totalBasket.toLocaleString()}</div>
+                                </div>
+
+                                {/* Basket Share */}
+                                <div style={{ background: 'rgba(244, 63, 94, 0.05)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.1)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#f43f5e' }}>ส่วนแบ่งตะกร้า</div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalBasketShare.toLocaleString()}</div>
+                                </div>
+
+                                {/* Fuel */}
+                                <div style={{ background: 'rgba(244, 63, 94, 0.05)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.1)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#f43f5e' }}>ค่าน้ำมัน</div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalFuel.toLocaleString()}</div>
+                                </div>
+
+                                {/* Maintenance */}
+                                <div style={{ background: 'rgba(244, 63, 94, 0.05)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.1)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#f43f5e' }}>ค่าซ่อม</div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalMaintenance.toLocaleString()}</div>
+                                </div>
+
+                                {/* Advance (Yod Berk) */}
+                                <div style={{ background: 'rgba(245, 158, 11, 0.08)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#f59e0b' }}>ยอดเบิก</div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#f59e0b' }}>฿{stats.totalStaffAdvance.toLocaleString()}</div>
+                                </div>
+
+                                {/* Net Pay to Driver */}
+                                <div style={{ background: 'rgba(168, 85, 247, 0.08)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#a855f7' }}>คงเหลือน้อง</div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#a855f7' }}>฿{stats.totalNetPay.toLocaleString()}</div>
+                                </div>
+
+                                {/* Net Profit */}
+                                <div style={{ gridColumn: '1 / -1', background: 'rgba(34, 197, 94, 0.08)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(34, 197, 94, 0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.9rem', opacity: 0.9, color: '#22c55e' }}>กำไรสุทธิ</div>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#22c55e' }}>฿{stats.totalProfit.toLocaleString()}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <MonthlyTable
+                            currentMonth={currentMonth}
+                            currentYear={currentYear}
+                            trips={currentMonthTripsEnriched}
+                            onMonthChange={handleMonthChange}
+                            cnDeductions={cnDeductions}
+                            setCnDeductions={setCnDeductions}
+                            showSlips={true} // Only show slips here
+                            onlySlips={true} // Helper prop to render ONLY the slips section
+                        />
+                    </div>
+                )}
             </div>
+
+            {/* Modal for Maximized View Editing/Adding */}
+            <TripEditModal
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setEditingTrip(null);
+                }}
+                onAdd={handleAddTrip}
+                onUpdate={handleUpdateTrip}
+                uploadFile={uploadFile}
+                routePresets={routePresets}
+                fetchPresets={fetchPresets}
+                externalDate={formDate}
+                onDateChange={(val) => setFormDate({ value: val, ts: Date.now() })}
+                editingTrip={editingTrip}
+            />
+
+            {/* Floating Action Button for Adding in Maximized Mode */}
+            {/* Floating Action Button - Always visible now */}
+            <button
+                onClick={() => {
+                    setEditingTrip(null);
+                    setIsModalOpen(true);
+                }}
+                style={{
+                    position: 'fixed',
+                    bottom: '2rem',
+                    right: '2rem',
+                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '60px',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 10px 25px rgba(59, 130, 246, 0.4)',
+                    cursor: 'pointer',
+                    zIndex: 100,
+                    transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                }}
+                className="fab-add"
+                title="เพิ่มรายการใหม่"
+            >
+                <Plus size={28} strokeWidth={2.5} />
+            </button>
 
             <style dangerouslySetInnerHTML={{
                 __html: `
                 .admin-main-grid {
                     display: flex;
                     gap: 1.25rem;
-                    align-items: stretch;
+                    align-items: start; /* Changed from stretch to start for sticky to work */
                     margin-top: 0.5rem;
                     flex: ${isMaximized ? 'none' : '1'};
                     height: ${isMaximized ? 'auto' : 'initial'};
@@ -229,6 +369,31 @@ const Dashboard = () => {
                     display: ${isMaximized ? 'none' : 'flex'};
                     flex: 0 0 380px;
                     min-height: 0;
+                    position: sticky;
+                    top: 1rem;
+                    height: calc(100vh - 2rem);
+                    overflow: hidden;
+                }
+                @media (max-width: 1200px) {
+                    .admin-main-grid {
+                        flex-direction: column;
+                        height: auto;
+                        flex: none;
+                    }
+                    .admin-form-col { 
+                        display: flex !important;
+                        width: 100%; 
+                        flex: none; 
+                        order: 1; /* Form top */
+                        height: auto; 
+                        padding: 0; 
+                    }
+                    .admin-table-col {
+                        order: 2; /* Table bottom */
+                        width: 100%;
+                        flex: none;
+                        overflow: visible;
+                    }
                 }
                 .admin-form-col > form {
                     flex: 1;
@@ -245,6 +410,7 @@ const Dashboard = () => {
                 /* Custom Scrollbar */
                 .admin-form-col > form::-webkit-scrollbar { width: 4px; }
                 .admin-form-col > form::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+                .hide-scrollbar::-webkit-scrollbar { display: none; }
 
                 .admin-table-col {
                     flex: 1;
@@ -257,7 +423,7 @@ const Dashboard = () => {
                     box-shadow: 
                         0 20px 50px -10px rgba(0,0,0,0.5),
                         inset 0 1px 1px rgba(255,255,255,0.05);
-                    height: ${isMaximized ? 'auto' : '100%'};
+                    height: auto;
                     display: flex;
                     flex-direction: column;
                     min-height: 0;
@@ -270,8 +436,9 @@ const Dashboard = () => {
                 }
                 .admin-table-col .table-container {
                     flex: 1;
-                    overflow-y: ${isMaximized ? 'visible' : 'auto'};
-                    height: ${isMaximized ? 'auto' : 'initial'};
+                    /* Remove overflow-y auto to let window handle scroll */
+                    overflow-y: visible;
+                    height: auto;
                 }
                 .summary-horizontal-grid {
                     display: grid;
@@ -353,18 +520,43 @@ const Dashboard = () => {
                 .btn-icon-refresh:hover { background: var(--primary); border-color: var(--primary); color: white; }
                 
                 @media (max-width: 1200px) {
-                    .admin-main-grid { flex-direction: column; height: auto; display: flex; }
-                    .admin-form-col { width: 100%; flex: none; order: 1; height: auto; padding: 0.5rem; }
-                    .admin-form-col > form { height: auto !important; overflow: visible !important; border-radius: 1.5rem!important; padding: 1.5rem!important; }
-                    .admin-table-col { width: 100%; flex: none; order: 2; margin-top: 1rem; height: auto !important; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-                    .header-flex-premium { padding: 1rem; }
-                    .logo-group img { height: 60px!important; }
-                    .brand-logo { font-size: 1.2rem!important; }
+                    .admin-main-grid { 
+                        flex-direction: column !important; 
+                        height: auto !important; 
+                        display: flex !important; 
+                        overflow: visible !important;
+                    }
+                    .admin-form-col { 
+                        width: 100% !important; 
+                        flex: none !important; 
+                        order: 1 !important; 
+                        height: auto !important; 
+                        padding: 0 !important; 
+                        display: flex !important;
+                    }
+                    .admin-form-col > form { 
+                        height: auto !important; 
+                        overflow: visible !important; 
+                        border-radius: 1.5rem !important; 
+                        padding: 1.2rem !important; 
+                        margin-bottom: 1.5rem !important;
+                    }
+                    .admin-table-col { 
+                        width: 100% !important; 
+                        flex: none !important; 
+                        order: 2 !important; 
+                        height: auto !important; 
+                        overflow-x: auto !important; 
+                        -webkit-overflow-scrolling: touch !important; 
+                        margin-top: 0 !important;
+                    }
+                    .header-flex-premium { padding: 0.5rem; }
+                    .logo-group img { height: 60px !important; }
+                    .brand-logo { font-size: 1.2rem !important; }
                 }
-                @media (max-width: 480px) {
-                    .admin-main-grid { padding: 0.5rem; }
-                    .stat-card { padding: 1rem; }
-                    .stat-value { font-size: 1.5rem; }
+                @media (max-width: 1200px) {
+                    html, body, #root { height: auto !important; overflow: auto !important; }
+                    .dashboard-premium { height: auto !important; overflow: visible !important; min-height: 100vh; }
                 }
 
             `}} />

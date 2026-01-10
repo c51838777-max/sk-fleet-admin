@@ -97,6 +97,7 @@ export const useTrips = () => {
                 if (error) throw error;
 
                 if (data) {
+                    console.log(`Successfully fetched ${data.length} trips.`);
                     const normalized = data.map(normalizeTrip).filter(Boolean);
                     setTrips(normalized);
                     localStorage.setItem('trips', JSON.stringify(normalized));
@@ -120,14 +121,35 @@ export const useTrips = () => {
         let finalPresets = {};
 
         for (const suffix of suffixes) {
-            const { data } = await supabase.from('route_presets').select('*').ilike('route_name', `%${suffix}`);
-            if (data && data.length > 0) {
-                data.forEach(p => {
-                    const cleanName = p.route_name.replace(suffix, '').trim();
-                    if (!finalPresets[cleanName]) {
-                        finalPresets[cleanName] = { price: p.price, wage: p.wage };
+            try {
+                // Defensive check: if suffix is empty, we just fetch everything, but ilike '%' is standard
+                const query = supabase.from('route_presets').select('*');
+
+                // Only apply ilike if we have a reason to, or use a broad match
+                const { data, error } = await query.ilike('route_name', `%${suffix}`);
+
+                if (error) {
+                    // If 400, it might be a missing column. Let's try to just select everything as fallback.
+                    if (error.code === '42703' || error.status === 400) {
+                        console.warn(`Column "route_name" might be missing in route_presets. Error: ${error.message}`);
+                    } else {
+                        console.warn(`Supabase error for suffix "${suffix}":`, error.message);
                     }
-                });
+                    continue;
+                }
+
+                if (data && data.length > 0) {
+                    data.forEach(p => {
+                        // Handle potential missing route_name in data
+                        const rName = p.route_name || p.name || p.route || 'Unknown';
+                        const cleanName = rName.replace(suffix, '').trim();
+                        if (!finalPresets[cleanName]) {
+                            finalPresets[cleanName] = { price: p.price, wage: p.wage };
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error(`Unexpected error fetching presets:`, err);
             }
         }
 
@@ -140,14 +162,18 @@ export const useTrips = () => {
     const fetchCnDeductions = useCallback(async () => {
         if (!isSupabaseReady) return;
         try {
-            const { data } = await supabase.from('cn_deductions').select('*');
+            const { data, error } = await supabase.from('cn_deductions').select('*');
+            if (error) {
+                console.warn("CN Deductions table might be missing:", error.message);
+                return;
+            }
             if (data) {
                 const mapping = {};
                 data.forEach(d => mapping[d.driver_name] = d.amount);
                 setCnDeductions(prev => ({ ...prev, ...mapping }));
             }
         } catch (error) {
-            console.error("Error fetching CN deductions:", error);
+            console.error("Error fetching CN deductions (Non-critical):", error);
         }
     }, [isSupabaseReady]);
 

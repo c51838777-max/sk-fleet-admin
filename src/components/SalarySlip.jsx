@@ -1,6 +1,9 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { X, Printer, Truck, Wallet, TrendingDown, Info, Shield, Receipt, Download, Image as ImageIcon } from 'lucide-react';
 import html2canvas from 'html2canvas';
+import { logoBase64 } from '../assets/logoBase64';
+
 
 const SalarySlip = ({ driverName, trips, onClose, period, cnDeduction = 0 }) => {
     const slipRef = React.useRef(null);
@@ -60,7 +63,7 @@ const SalarySlip = ({ driverName, trips, onClose, period, cnDeduction = 0 }) => 
         }
     };
 
-    return (
+    const modalContent = (
         <div className="modal-overlay fade-in">
             <div className="slip-window">
                 <div ref={slipRef} className="glass-card slip-card-premium fade-in-up">
@@ -68,7 +71,7 @@ const SalarySlip = ({ driverName, trips, onClose, period, cnDeduction = 0 }) => 
                     <div className="slip-header-premium">
                         <div className="header-brand">
                             <div className="brand-logo-container" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                <img src="/mainlogo.png?v=JAN9" alt="Logo" style={{ height: '55px', width: 'auto', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }} />
+                                <img src={logoBase64} alt="Logo" style={{ height: '65px', width: 'auto', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.4)', display: 'block' }} />
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                     <h1 className="brand-logo" style={{ fontSize: '1.3rem', margin: 0, lineHeight: '1.2', fontWeight: '800' }}>ภัทธา ทรานสปอร์ต</h1>
                                     <span style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 'bold', letterSpacing: '1px' }}>PATTA TRANSPORT</span>
@@ -201,7 +204,8 @@ const SalarySlip = ({ driverName, trips, onClose, period, cnDeduction = 0 }) => 
                     display: flex;
                     align-items: flex-start;
                     justify-content: center;
-                    z-index: 1000;
+                    justify-content: center;
+                    z-index: 9999;
                     padding: 2rem 1rem;
                     overflow-y: auto;
                 }
@@ -347,10 +351,18 @@ const SalarySlip = ({ driverName, trips, onClose, period, cnDeduction = 0 }) => 
                 .print-only { display: none; }
                 
                 @media (max-width: 480px) {
-                    .modal-overlay { padding: 0.5rem; background: #020617; }
-                    .slip-window { max-width: 100%; }
-                    .slip-card-premium { border-radius: 1.5rem; box-shadow: none; border: none; }
-                    .slip-header-premium { padding: 1.25rem 1.25rem 0.75rem; }
+                    .modal-overlay { padding: 1rem; align-items: center; } /* Keep overlay transparent */
+                    .slip-window { max-width: 100%; width: 100%; }
+                    .slip-card-premium { 
+                        max-height: 85vh; 
+                        overflow-y: auto; 
+                        border-radius: 1.5rem; 
+                        /* Restore card look */
+                        background: linear-gradient(165deg, #0f172a 0%, #020617 100%);
+                        border: 1px solid rgba(255, 255, 255, 0.1); 
+                        box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+                    }
+                    .slip-header-premium { padding: 1.25rem 1.25rem 0.5rem; }
                     .slip-body-premium { padding: 0.5rem 1.25rem 1.5rem; }
                     .brand-title { font-size: 1.25rem; }
                     .pay-amount-row .amount { font-size: 2.2rem; }
@@ -414,6 +426,8 @@ const SalarySlip = ({ driverName, trips, onClose, period, cnDeduction = 0 }) => 
             )}
         </div>
     );
+
+    return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default SalarySlip;

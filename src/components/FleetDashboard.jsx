@@ -1,5 +1,6 @@
 import React from 'react';
 import { Truck, DollarSign, Fuel, Users, CreditCard, ShoppingCart, Settings, Wallet, Banknote, Undo2 } from 'lucide-react';
+import bgSrc from '../assets/admin-bg.png';
 
 const StatCard = ({ title, value, icon: _Icon, color, subValue }) => {
     const getColorClass = () => {
@@ -27,7 +28,7 @@ const StatCard = ({ title, value, icon: _Icon, color, subValue }) => {
     );
 };
 
-const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], currentMonth, currentYear, viewType, setViewType, children, isMaximized }) => {
+const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], currentMonth, currentYear, viewType, setViewType, children, isMaximized, hideStats = false }) => {
     const currentStats = viewType === 'monthly' ? stats : yearlyStats;
 
     const monthNames = [
@@ -39,76 +40,80 @@ const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], curre
         <div className="dashboard-container">
 
 
-            <div className="summary-section-premium">
-                <div className="section-header">
-                    <ShoppingCart size={16} />
-                    <span>สรุปผลประกอบการประจำรอบ ({monthNames[currentMonth]} {currentYear + 543})</span>
-                </div>
+            {!hideStats && (
+                <div className="summary-section-premium" style={{
+                    marginBottom: '1rem'
+                }}>
+                    <div className="section-header" style={{ paddingTop: '0.75rem' }}>
+                        <ShoppingCart size={16} />
+                        <span>สรุปผลประกอบการประจำรอบ ({monthNames[currentMonth]} {currentYear + 543})</span>
+                    </div>
 
-                <div className="summary-grid-fixed">
+                    <div className="summary-grid-fixed">
 
-                    <StatCard
-                        title="รายได้ทั้งหมด"
-                        value={currentStats.totalRevenue}
-                        icon={Wallet}
-                        color="blue"
-                    />
-                    <StatCard
-                        title="ค่าเที่ยว"
-                        value={currentStats.totalPrice}
-                        icon={Banknote}
-                        color="white"
-                    />
-                    <StatCard
-                        title="ค่าแรง"
-                        value={currentStats.totalWage}
-                        icon={Users}
-                        color="white"
-                    />
-                    <StatCard
-                        title="ค่าตะกร้า"
-                        value={currentStats.totalBasket}
-                        icon={ShoppingCart}
-                        color="white"
-                    />
-                    <StatCard
-                        title="ส่วนแบ่งตะกร้า"
-                        value={currentStats.totalBasketShare}
-                        icon={ShoppingCart}
-                        color="red"
-                    />
-                    <StatCard
-                        title="ค่าน้ำมัน"
-                        value={currentStats.totalFuel}
-                        icon={Fuel}
-                        color="red"
-                    />
-                    <StatCard
-                        title="ค่าซ่อมบำรุง"
-                        value={currentStats.totalMaintenance}
-                        icon={Settings}
-                        color="red"
-                    />
-                    <StatCard
-                        title="ยอดเบิก"
-                        value={currentStats.totalStaffAdvance}
-                        icon={Wallet}
-                        color="orange"
-                    />
-                    <StatCard
-                        title="คงเหลือน้อง"
-                        value={currentStats.totalNetPay}
-                        icon={CreditCard}
-                        color="purple"
-                    />
-                    <StatCard
-                        title="กำไรสุทธิ"
-                        value={currentStats.totalProfit}
-                        icon={DollarSign}
-                        color="green"
-                    />
+                        <StatCard
+                            title="รายได้ทั้งหมด"
+                            value={currentStats.totalRevenue}
+                            icon={Wallet}
+                            color="blue"
+                        />
+                        <StatCard
+                            title="ค่าเที่ยว"
+                            value={currentStats.totalPrice}
+                            icon={Banknote}
+                            color="white"
+                        />
+                        <StatCard
+                            title="ค่าแรง"
+                            value={currentStats.totalWage}
+                            icon={Users}
+                            color="white"
+                        />
+                        <StatCard
+                            title="ค่าตะกร้า"
+                            value={currentStats.totalBasket}
+                            icon={ShoppingCart}
+                            color="white"
+                        />
+                        <StatCard
+                            title="ส่วนแบ่งตะกร้า"
+                            value={currentStats.totalBasketShare}
+                            icon={ShoppingCart}
+                            color="red"
+                        />
+                        <StatCard
+                            title="ค่าน้ำมัน"
+                            value={currentStats.totalFuel}
+                            icon={Fuel}
+                            color="red"
+                        />
+                        <StatCard
+                            title="ค่าซ่อมบำรุง"
+                            value={currentStats.totalMaintenance}
+                            icon={Settings}
+                            color="red"
+                        />
+                        <StatCard
+                            title="ยอดเบิก"
+                            value={currentStats.totalStaffAdvance}
+                            icon={Wallet}
+                            color="orange"
+                        />
+                        <StatCard
+                            title="คงเหลือน้อง"
+                            value={currentStats.totalNetPay}
+                            icon={CreditCard}
+                            color="purple"
+                        />
+                        <StatCard
+                            title="กำไรสุทธิ"
+                            value={currentStats.totalProfit}
+                            icon={DollarSign}
+                            color="green"
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
 
             <main className="dashboard-content" style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
                 {viewType === 'monthly' ? children : (
@@ -136,38 +141,40 @@ const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], curre
                 __html: `
                 .dashboard-container { 
                     min-height: 100vh;
-                    height: ${isMaximized ? 'auto' : '100vh'}; 
-                    display: flex; 
-                    flex-direction: column; 
-                    overflow: ${isMaximized ? 'visible' : 'hidden'}; 
-                .dashboard-container { 
-                    min-height: 100vh;
                     min-height: -webkit-fill-available;
                     display: flex; 
                     flex-direction: column; 
-                    overflow: ${isMaximized ? 'visible' : 'hidden'}; 
                     background-color: #020617;
-                    background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.9)), url('/patta_hero_v4.png');
+                    background-image: 
+                        linear-gradient(to bottom, rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 0.8)),
+                        url(${bgSrc});
                     background-size: cover;
                     background-position: center;
-                    background-attachment: scroll;
-                    background-repeat: no-repeat;
                     padding: 1.5rem;
                     perspective: 2000px;
+                    /* Fix for Sticky: Let the window handle scrolling, remove overflow constraint */
+                    overflow: visible;
                 }
-                @media (min-width: 1025px) {
-                    .dashboard-container { background-attachment: fixed; }
+
+
+
+                @media (max-width: 1200px) {
+                    .dashboard-container {
+                        height: auto !important;
+                        overflow: visible !important;
+                        padding: 0.75rem;
+                    }
                 }
                 .dashboard-header-premium { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-                .brand-logo { font-size: 2.2rem; font-weight: 900; letter-spacing: 4px; color: #fff; margin:0; line-height:1; }
+                .brand-logo { font-size: 2.2rem; font-weight: 900; letter-spacing: 4px; color: #fff; margin:0; line-height:1; background: none; -webkit-text-fill-color: initial; }
                 .brand-subtitle { font-size: 10px; letter-spacing: 8px; color: var(--primary); margin: 5px 0 0 0; font-weight: 700; }
                 
                 .header-right { display: flex; align-items: center; gap: 1rem; }
-                .status-pill { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); }
-                .status-pill.online { color: #2dd4bf; border-color: rgba(45, 212, 191, 0.2); }
+                .status-pill { padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; box-shadow: none; }
+                .status-pill.online { color: #2dd4bf; border-color: rgba(45, 212, 191, 0.2); background: rgba(45, 212, 191, 0.05); }
                 .status-pill.online .dot { width: 6px; height: 6px; background: #2dd4bf; border-radius: 50%; box-shadow: 0 0 10px #2dd4bf; }
                 
-                .view-switcher-glass { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 4px; border-radius: 12px; display: flex; gap: 4px; }
+                .view-switcher-glass { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 4px; border-radius: 12px; display: flex; gap: 4px; box-shadow: none; }
                 .switch-btn { padding: 6px 16px; border: none; background: none; color: var(--text-dim); cursor: pointer; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
                 .switch-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3); }
                 
@@ -213,6 +220,13 @@ const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], curre
                 .text-purple-deep { color: #a855f7 !important; }
                 .text-green-deep { color: #22c55e !important; }
                 .text-main-dark { color: var(--text-main) !important; }
+                
+                .text-blue-deep { color: #38bdf8 !important; }
+                .text-danger-bold { color: #f43f5e !important; }
+                .text-warning-bold { color: #f59e0b !important; }
+                .text-purple-deep { color: #a855f7 !important; }
+                .text-green-deep { color: #22c55e !important; }
+                .text-main-dark { color: var(--text-main) !important; }
 
                 .summary-card-mini { 
                     backdrop-filter: blur(10px);
@@ -220,10 +234,17 @@ const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], curre
                 }
                 .summary-card-mini:hover {
                     transform: translateY(-8px) translateZ(10px) rotateX(2deg) rotateY(-1deg);
-                    background: rgba(255, 255, 255, 0.08);
+                    background: rgba(255, 255, 255, 0.8);
                     box-shadow: 
-                        0 25px 50px -12px rgba(0,0,0,0.7),
-                        0 15px 20px -5px rgba(0,0,0,0.5);
+                        0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+                        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+                        inset 0 0 0 1px rgba(255,255,255,0.6);
+                    backdrop-filter: blur(12px);
+                }
+                .summary-card-mini .card-value {
+                    background: -webkit-linear-gradient(45deg, #334155, #475569);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
                 }
 
                 @media (max-width: 1024px) {
