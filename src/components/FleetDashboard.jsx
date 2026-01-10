@@ -233,18 +233,13 @@ const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], curre
                     transition: all 0.3s ease;
                 }
                 .summary-card-mini:hover {
-                    transform: translateY(-8px) translateZ(10px) rotateX(2deg) rotateY(-1deg);
-                    background: rgba(255, 255, 255, 0.8);
-                    box-shadow: 
-                        0 20px 25px -5px rgba(0, 0, 0, 0.1), 
-                        0 10px 10px -5px rgba(0, 0, 0, 0.04),
-                        inset 0 0 0 1px rgba(255,255,255,0.6);
-                    backdrop-filter: blur(12px);
+                    transform: translateY(-5px);
+                    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.5);
+                    border-color: rgba(255,255,255,0.2);
+                    filter: brightness(1.2);
                 }
                 .summary-card-mini .card-value {
-                    background: -webkit-linear-gradient(45deg, #334155, #475569);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
+                    color: inherit;
                 }
 
                 @media (max-width: 1024px) {
