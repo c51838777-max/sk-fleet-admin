@@ -155,20 +155,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* Monthly/Yearly Switcher moved from FleetDashboard */}
-                    <div className="view-switcher-glass" style={{ display: 'flex', gap: '4px', padding: '4px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}>
-                        <button
-                            className={`switch-btn ${viewType === 'monthly' ? 'active' : ''}`}
-                            onClick={() => setViewType('monthly')}
-                        >
-                            รายเดือน
-                        </button>
-                        <button
-                            className={`switch-btn ${viewType === 'yearly' ? 'active' : ''}`}
-                            onClick={() => setViewType('yearly')}
-                        >
-                            รายปี
-                        </button>
-                    </div>
+
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -221,87 +208,93 @@ const Dashboard = () => {
                     )}
                 </div>
 
-                {/* Right Column: Salary Slips (Only visible in Monthly View) */}
+                {/* Right Column: Salary Slips & Stats (Only visible in Monthly View) */}
                 {viewMode === 'monthly' && (
-                    <div className="admin-slips-col hide-scrollbar" style={{ flex: '0 0 380px', position: 'sticky', top: '1rem', maxHeight: 'calc(100vh - 2rem)', overflowY: 'auto', paddingRight: '4px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                        {/* Stats Section in Right Column */}
-                        <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.25rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="admin-slips-col" style={{
+                        flex: '0 0 380px',
+                        position: 'sticky',
+                        top: '20px',
+                        height: 'fit-content',
+                        zIndex: 10,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1.25rem'
+                    }}>
+
+                        {/* 1. สรุปผลประกอบการ (Stats Section) */}
+                        <div className="glass-card" style={{ padding: '1.25rem', border: '1px solid rgba(255,255,255,0.05)', background: 'var(--bg-card)' }}>
                             <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)' }}>
                                 <ShoppingCart size={18} /> สรุปผลประกอบการ
                             </h3>
+
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                                {/* Revenue */}
-                                <div style={{ gridColumn: '1 / -1', background: 'rgba(56, 189, 248, 0.08)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ fontSize: '0.8rem', opacity: 0.9, color: '#38bdf8' }}>รายได้รวม</div>
-                                    <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#38bdf8' }}>฿{stats.totalRevenue.toLocaleString()}</div>
+                                {/* รายได้รวม (Full Width) */}
+                                <div style={{ gridColumn: '1 / -1', background: 'rgba(56, 189, 248, 0.1)', padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.9rem', color: '#38bdf8', fontWeight: '600' }}>รายได้รวม</div>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#38bdf8' }}>฿{stats.totalRevenue.toLocaleString()}</div>
                                 </div>
 
-                                {/* Total Price (Ka Tiew) */}
+                                {/* Row 1: ค่าเที่ยว - ค่าแรง */}
                                 <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px' }}>ค่าเที่ยว</div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700' }}>฿{stats.totalPrice.toLocaleString()}</div>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.7, marginBottom: '2px' }}>ค่าเที่ยว</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700' }}>฿{stats.totalPrice.toLocaleString()}</div>
                                 </div>
-
-                                {/* Wages */}
                                 <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px' }}>ค่าแรง</div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700' }}>฿{stats.totalWage.toLocaleString()}</div>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.7, marginBottom: '2px' }}>ค่าแรง</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700' }}>฿{stats.totalWage.toLocaleString()}</div>
                                 </div>
 
-                                {/* Basket */}
+                                {/* Row 2: ค่าตะกร้า - ส่วนแบ่งตะกร้า */}
                                 <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px' }}>ค่าตะกร้า</div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700' }}>฿{stats.totalBasket.toLocaleString()}</div>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.7, marginBottom: '2px' }}>ค่าตะกร้า</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700' }}>฿{stats.totalBasket.toLocaleString()}</div>
+                                </div>
+                                <div style={{ background: 'rgba(244, 63, 94, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#f43f5e' }}>ส่วนแบ่งตะกร้า</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalBasketShare.toLocaleString()}</div>
                                 </div>
 
-                                {/* Basket Share */}
-                                <div style={{ background: 'rgba(244, 63, 94, 0.05)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.1)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#f43f5e' }}>ส่วนแบ่งตะกร้า</div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalBasketShare.toLocaleString()}</div>
+                                {/* Row 3: ค่าน้ำมัน - ค่าซ่อม */}
+                                <div style={{ background: 'rgba(244, 63, 94, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#f43f5e' }}>ค่าน้ำมัน</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalFuel.toLocaleString()}</div>
+                                </div>
+                                <div style={{ background: 'rgba(244, 63, 94, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#f43f5e' }}>ค่าซ่อม</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalMaintenance.toLocaleString()}</div>
                                 </div>
 
-                                {/* Fuel */}
-                                <div style={{ background: 'rgba(244, 63, 94, 0.05)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.1)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#f43f5e' }}>ค่าน้ำมัน</div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalFuel.toLocaleString()}</div>
+                                {/* Row 4: ยอดเบิก - คงเหลือน้อง */}
+                                <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#f59e0b' }}>ยอด.เบิก</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700', color: '#f59e0b' }}>฿{stats.totalStaffAdvance.toLocaleString()}</div>
+                                </div>
+                                <div style={{ background: 'rgba(168, 85, 247, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#a855f7' }}>คงเหลือน้อง</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700', color: '#a855f7' }}>฿{stats.totalNetPay.toLocaleString()}</div>
                                 </div>
 
-                                {/* Maintenance */}
-                                <div style={{ background: 'rgba(244, 63, 94, 0.05)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.1)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#f43f5e' }}>ค่าซ่อม</div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalMaintenance.toLocaleString()}</div>
-                                </div>
-
-                                {/* Advance (Yod Berk) */}
-                                <div style={{ background: 'rgba(245, 158, 11, 0.08)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#f59e0b' }}>ยอดเบิก</div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#f59e0b' }}>฿{stats.totalStaffAdvance.toLocaleString()}</div>
-                                </div>
-
-                                {/* Net Pay to Driver */}
-                                <div style={{ background: 'rgba(168, 85, 247, 0.08)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.8, marginBottom: '2px', color: '#a855f7' }}>คงเหลือน้อง</div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: '#a855f7' }}>฿{stats.totalNetPay.toLocaleString()}</div>
-                                </div>
-
-                                {/* Net Profit */}
-                                <div style={{ gridColumn: '1 / -1', background: 'rgba(34, 197, 94, 0.08)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(34, 197, 94, 0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ fontSize: '0.9rem', opacity: 0.9, color: '#22c55e' }}>กำไรสุทธิ</div>
-                                    <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#22c55e' }}>฿{stats.totalProfit.toLocaleString()}</div>
+                                {/* กำไรสุทธิ (Full Width) */}
+                                <div style={{ gridColumn: '1 / -1', background: 'rgba(34, 197, 94, 0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(34, 197, 94, 0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+                                    <div style={{ fontSize: '1rem', color: '#22c55e', fontWeight: '600' }}>กำไรสุทธิ</div>
+                                    <div style={{ fontSize: '1.4rem', fontWeight: '800', color: '#22c55e' }}>฿{stats.totalProfit.toLocaleString()}</div>
                                 </div>
                             </div>
                         </div>
 
-                        <MonthlyTable
-                            currentMonth={currentMonth}
-                            currentYear={currentYear}
-                            trips={currentMonthTripsEnriched}
-                            onMonthChange={handleMonthChange}
-                            cnDeductions={cnDeductions}
-                            setCnDeductions={setCnDeductions}
-                            showSlips={true} // Only show slips here
-                            onlySlips={true} // Helper prop to render ONLY the slips section
-                        />
+                        {/* 2. ออกสลิปเงินเดือน (Slips Section) */}
+                        <div style={{ flex: 1 }}>
+                            <MonthlyTable
+                                currentMonth={currentMonth}
+                                currentYear={currentYear}
+                                trips={currentMonthTripsEnriched}
+                                onMonthChange={handleMonthChange}
+                                cnDeductions={cnDeductions}
+                                setCnDeductions={setCnDeductions}
+                                showSlips={true} // Only show slips here
+                                onlySlips={true} // Helper prop to render ONLY the slips section
+                            />
+                        </div>
                     </div>
                 )}
             </div>
