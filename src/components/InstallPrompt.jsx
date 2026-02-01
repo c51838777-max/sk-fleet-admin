@@ -63,7 +63,6 @@ const InstallPrompt = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '12px',
-            gap: '12px',
             animation: 'slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
         }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

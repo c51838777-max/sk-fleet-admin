@@ -88,13 +88,13 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                     </h3>
                     <div style={onlySlips ? { display: 'flex', flexDirection: 'column', gap: '0.8rem' } : { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))', gap: '1.25rem' }}>
                         {(() => {
-                            const tripsInPeriod = datesInRange.flatMap(date => {
-                                const y = date.getFullYear();
-                                const m = String(date.getMonth() + 1).padStart(2, '0');
-                                const d = String(date.getDate()).padStart(2, '0');
-                                const dateStr = `${y}-${m}-${d}`;
-                                return trips.filter(t => t.date === dateStr);
-                            });
+                            const tripsInPeriod = (() => {
+                                const start = new Date(currentYear, currentMonth - 1, 20);
+                                const end = new Date(currentYear, currentMonth, 19);
+                                const startStr = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-20`;
+                                const endStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-19`;
+                                return trips.filter(t => t.date && t.date >= startStr && t.date <= endStr);
+                            })();
 
                             const driversMap = {};
                             tripsInPeriod.forEach(t => {
@@ -184,20 +184,32 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
 
                                 if (data.items.length === 0) {
                                     return [(
-                                        <tr key={`empty-${dateStr}`} style={isToday ? { background: 'rgba(99, 102, 241, 0.1)' } : {}}>
+                                        <tr
+                                            key={`empty-${dateStr}`}
+                                            onClick={() => onSelectDate(dateStr)}
+                                            className="clickable-row"
+                                            style={{
+                                                cursor: 'pointer',
+                                                background: isToday ? 'rgba(99, 102, 241, 0.1)' : 'transparent'
+                                            }}
+                                        >
                                             <td style={{ padding: '0.4rem 0.2rem', textAlign: 'center' }}>
                                                 <span style={{ fontWeight: '500', color: isToday ? 'var(--primary)' : 'var(--text-dim)', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
                                                     {date.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                                                 </span>
                                             </td>
-                                            <td colSpan={10} style={{ textAlign: 'center', color: 'var(--text-dim)', opacity: 0.3, fontSize: '0.7rem' }}>ไม่มีรายการ</td>
+                                            <td colSpan={10} style={{ textAlign: 'center', color: 'var(--text-dim)', opacity: 0.3, fontSize: '0.7rem' }}>ไม่มีรายการ (คลิกเพื่อเพิ่ม)</td>
                                             <td></td>
                                         </tr>
                                     )];
                                 }
 
                                 return data.items.map((trip, tIdx) => (
-                                    <tr key={trip.id} style={isToday ? { background: 'rgba(99, 102, 241, 0.1)' } : {}}>
+                                    <tr
+                                        key={trip.id || `trip-${dateStr}-${tIdx}`}
+                                        style={isToday ? { background: 'rgba(99, 102, 241, 0.1)' } : {}}
+                                        className="trip-row-hover"
+                                    >
                                         <td style={{ padding: '0.5rem', textAlign: 'center', borderRight: tIdx === 0 ? '1px solid rgba(255,255,255,0.03)' : 'none' }}>
                                             {tIdx === 0 ? (
                                                 <span style={{ fontWeight: '500', color: isToday ? 'var(--primary)' : 'var(--text-main)', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
@@ -275,6 +287,7 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                                 const totals = datesInRange.reduce((acc, date) => {
                                     const data = getDayData(date);
                                     return {
+                                        count: acc.count + (data.count || 0),
                                         price: acc.price + (data.price || 0),
                                         fuel: acc.fuel + (data.fuel || 0),
                                         wage: acc.wage + (data.wage || 0),
@@ -284,41 +297,44 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                                         staffShare: acc.staffShare + (data.staffShare || 0),
                                         profit: acc.profit + (data.profit || 0)
                                     };
-                                }, { price: 0, fuel: 0, wage: 0, maintenance: 0, basket: 0, basketShare: 0, staffShare: 0, profit: 0 });
+                                }, { count: 0, price: 0, fuel: 0, wage: 0, maintenance: 0, basket: 0, basketShare: 0, staffShare: 0, profit: 0 });
 
                                 const totalCellStyles = { padding: '0.75rem 0.2rem', textAlign: 'center', fontSize: '0.85rem', fontFamily: "'Outfit', sans-serif" };
 
                                 return (
                                     <tr style={{ fontWeight: '800' }}>
-                                        <td style={{ ...totalCellStyles, color: 'var(--primary)', textAlign: 'center', fontFamily: "'Chakra Petch', sans-serif", fontSize: '0.9rem' }}>รวมสรุป</td>
+                                        <td style={{ ...totalCellStyles, color: 'var(--primary)', textAlign: 'center', fontFamily: "'Chakra Petch', sans-serif", fontSize: '0.9rem' }}>
+                                            <div>รวมสรุป</div>
+                                            <div style={{ fontSize: '0.7rem', color: 'white', opacity: 0.8 }}>({totals.count} เที่ยว)</div>
+                                        </td>
                                         <td></td>
                                         <td></td>
                                         <td style={{ ...totalCellStyles, color: 'white' }}>
-                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>ยอดรวม</div>
+                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>รวมค่าเที่ยว</div>
                                             ฿{totals.price.toLocaleString()}
                                         </td>
                                         <td style={{ ...totalCellStyles, color: 'var(--danger)' }}>
-                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>- น้ำมัน</div>
+                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>น้ำมัน</div>
                                             ฿{totals.fuel.toLocaleString()}
                                         </td>
                                         <td style={{ ...totalCellStyles, color: 'var(--danger)' }}>
-                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>- ค่าจ้าง</div>
+                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>ค่าแรง</div>
                                             ฿{totals.wage.toLocaleString()}
                                         </td>
                                         <td style={{ ...totalCellStyles, color: 'var(--danger)' }}>
-                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>- ค่าซ่อม</div>
+                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>ซ่อม</div>
                                             ฿{totals.maintenance.toLocaleString()}
                                         </td>
                                         <td style={{ ...totalCellStyles, color: 'var(--safe)' }}>
-                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>+ ตะกร้า</div>
+                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>รวมตะกร้า</div>
                                             ฿{totals.basket.toLocaleString()}
                                         </td>
                                         <td style={{ ...totalCellStyles, color: 'var(--danger)' }}>
-                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>- แบ่ง</div>
+                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>แบ่ง</div>
                                             ฿{totals.basketShare.toLocaleString()}
                                         </td>
                                         <td style={{ ...totalCellStyles, color: 'var(--warning)' }}>
-                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>- เบิก</div>
+                                            <div style={{ fontSize: '0.6rem', opacity: 0.6, marginBottom: '-2px' }}>เบิก</div>
                                             ฿{totals.staffShare.toLocaleString()}
                                         </td>
                                         <td style={{ padding: '0.5rem 0' }}>
@@ -377,6 +393,12 @@ const MonthlyTable = ({ currentMonth, currentYear, trips, onMonthChange, onExpor
                     </div>
                 </div>
             )}
+            <style>{`
+                .clickable-row:hover { background: rgba(255,255,255,0.05) !important; }
+                .trip-row-hover:hover { background: rgba(255,255,255,0.02); }
+                .bill-icon-btn { margin-left: 4px; color: var(--primary); opacity: 0.7; }
+                .bill-icon-btn:hover { opacity: 1; transform: scale(1.1); }
+            `}</style>
         </div>
     );
 };

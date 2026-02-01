@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTrips } from '../hooks/useTrips';
 import { useFuel } from '../hooks/useFuel';
 import {
@@ -20,10 +20,14 @@ import {
     Upload,
     ChevronLeft,
     ChevronRight,
-    Camera
+    Camera,
+    Receipt,
+    Table
 } from 'lucide-react';
 import { getLocalDate } from '../utils/dateUtils';
 import SalarySlip from '../components/SalarySlip';
+import BillingSummary from '../components/BillingSummary';
+import DriverTripLog from '../components/DriverTripLog';
 import { logoBase64 } from '../assets/logoBase64';
 
 
@@ -36,9 +40,24 @@ const DriverEntry = () => {
     const [submitted, setSubmitted] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [showSlip, setShowSlip] = useState(false);
+    const [showBillingDoc, setShowBillingDoc] = useState(false);
+    const [showTripLog, setShowTripLog] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
-    const [slipMonth, setSlipMonth] = useState(new Date().getMonth());
-    const [slipYear, setSlipYear] = useState(new Date().getFullYear());
+
+    // Billing Logic: If day >= 20, default to showing NEXT month's data
+    const now = new Date();
+    let initialSlipMonth = now.getMonth();
+    let initialSlipYear = now.getFullYear();
+    if (now.getDate() >= 20) {
+        initialSlipMonth += 1;
+        if (initialSlipMonth > 11) {
+            initialSlipMonth = 0;
+            initialSlipYear += 1;
+        }
+    }
+
+    const [slipMonth, setSlipMonth] = useState(initialSlipMonth);
+    const [slipYear, setSlipYear] = useState(initialSlipYear);
     const [isUploading, setIsUploading] = useState(false);
     const [files, setFiles] = useState({ fuel: null, maintenance: null, basket: null });
 
@@ -221,6 +240,39 @@ const DriverEntry = () => {
         }
     };
 
+    // Safe Filter Logic for Reports
+    const filteredBillingTrips = React.useMemo(() => {
+        if (!formData.driverName) return [];
+        try {
+            const searchName = formData.driverName.trim().replace(/\s+/g, ' ');
+            // Handle edge case where slipMonth is invalid (though it shouldn't be with select 0-11)
+            const mIdx = parseInt(slipMonth);
+            const yIdx = parseInt(slipYear);
+
+            if (isNaN(mIdx) || isNaN(yIdx)) return [];
+
+            // Billing cycle: 20th of Prev Month to 19th of Current Month
+            const startDate = new Date(yIdx, mIdx - 1, 20);
+            const endDate = new Date(yIdx, mIdx, 19);
+
+            // Adjust bounds to cover full days if needed, but standard Date comparison works for 00:00:00
+
+            return trips.filter(t => {
+                if (!t.date) return false;
+                const [y, m, d] = t.date.split('-').map(Number);
+                if (!y) return false;
+                const checkDate = new Date(y, m - 1, d);
+
+                const tName = (t.driverName || '').trim().replace(/\s+/g, ' ');
+
+                return tName === searchName && checkDate >= startDate && checkDate <= endDate;
+            });
+        } catch (e) {
+            console.error("Filtering error:", e);
+            return [];
+        }
+    }, [trips, formData.driverName, slipMonth, slipYear]);
+
     return (
         <div className="driver-landscape">
             <header className="driver-premium-header slide-up">
@@ -383,10 +435,13 @@ const DriverEntry = () => {
                                     let rev = 0;
                                     let share = 0;
 
-                                    if (count > 100) {
+                                    if (count >= 101) {
                                         rev = 1000;
                                         share = 700;
-                                    } else if (count > 30) {
+                                    } else if (count >= 91) {
+                                        rev = 600;
+                                        share = 400;
+                                    } else if (count >= 86) {
                                         rev = 300;
                                         share = 200;
                                     }
@@ -481,9 +536,10 @@ const DriverEntry = () => {
                                 value={slipMonth}
                                 onChange={(e) => setSlipMonth(parseInt(e.target.value))}
                                 className="input-premium select-input"
+                                style={{ fontWeight: '600' }}
                             >
                                 {['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'].map((m, i) => (
-                                    <option key={i} value={i}>{m}</option>
+                                    <option key={i} value={i} style={{ color: '#000' }}>{m}</option>
                                 ))}
                             </select>
                         </div>
@@ -492,17 +548,25 @@ const DriverEntry = () => {
                                 value={slipYear}
                                 onChange={(e) => setSlipYear(parseInt(e.target.value))}
                                 className="input-premium select-input"
+                                style={{ fontWeight: '600' }}
                             >
-                                {[2024, 2025, 2026].map(y => (
-                                    <option key={y} value={y}>{y}</option>
-                                ))}
+                                {(() => {
+                                    const currentY = new Date().getFullYear();
+                                    const years = [currentY - 1, currentY, currentY + 1];
+                                    return years.map(y => (
+                                        <option key={y} value={y} style={{ color: '#000' }}>{y}</option>
+                                    ));
+                                })()}
                             </select>
                         </div>
                     </div>
 
+
                     <div className="action-grid">
                         <button
-                            className="btn-premium secondary-style"
+                            type="button"
+                            className="btn-premium"
+                            style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: 'white' }}
                             onClick={async () => {
                                 if (!formData.driverName.trim()) {
                                     alert('⚠️ กรุณาพิมพ์ "ชื่อคนขับ" ของคุณก่อนดูสลิปครับ');
@@ -518,81 +582,176 @@ const DriverEntry = () => {
                         </button>
 
                         <button
-                            className={`btn-secondary-premium ${showHistory ? 'active' : ''}`}
+                            type="button"
+                            className="btn-premium"
+                            style={{ background: 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)', color: 'white' }}
+                            onClick={async () => {
+                                if (!formData.driverName.trim()) {
+                                    alert('⚠️ กรุณาพิมพ์ "ชื่อคนขับ" ของคุณก่อนดูใบวางบิลครับ');
+                                    return;
+                                }
+                                await fetchTrips();
+                                setShowBillingDoc(true);
+                            }}
+                            disabled={loading}
+                        >
+                            <Receipt size={18} />
+                            <span>{loading ? 'กำลังโหลด...' : 'ดูใบวางบิล'}</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn-premium"
+                            style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white' }}
+                            onClick={async () => {
+                                if (!formData.driverName.trim()) {
+                                    alert('⚠️ กรุณาพิมพ์ "ชื่อคนขับ" ของคุณก่อนดูตารางลงงานครับ');
+                                    return;
+                                }
+                                await fetchTrips();
+                                setShowTripLog(true);
+                            }}
+                            disabled={loading}
+                        >
+                            <Table size={18} />
+                            <span>{loading ? 'กำลังโหลด...' : 'ดูตารางลงงาน'}</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn-premium"
+                            style={{
+                                background: showHistory
+                                    ? 'linear-gradient(135deg, #475569 0%, #1e293b 100%)'
+                                    : 'linear-gradient(135deg, #334155 0%, #0f172a 100%)',
+                                color: 'white',
+                                gridColumn: 'span 2'
+                            }}
                             onClick={() => setShowHistory(!showHistory)}
                         >
                             <History size={18} />
                             <span>{showHistory ? 'ปิดประวัติ' : 'ดูประวัติงาน'}</span>
                         </button>
                     </div>
+                </div>
 
-                    {showHistory && (
-                        <div className="history-timeline fade-in">
-                            {(() => {
-                                const searchName = formData.driverName.trim().replace(/\s+/g, ' ').toLowerCase();
-                                const filtered = trips.filter(t => {
-                                    const driverName = (t.driverName || '').trim().replace(/\s+/g, ' ').toLowerCase();
-                                    return searchName ? driverName === searchName : true;
-                                }).slice(0, 10);
+                {showHistory && (
+                    <div className="history-timeline fade-in">
+                        {(() => {
+                            const searchName = formData.driverName.trim().replace(/\s+/g, ' ').toLowerCase();
+                            const filtered = trips.filter(t => {
+                                const driverName = (t.driverName || '').trim().replace(/\s+/g, ' ').toLowerCase();
+                                return searchName ? driverName === searchName : true;
+                            }).slice(0, 10);
 
-                                if (filtered.length > 0) {
-                                    return filtered.map((trip) => (
-                                        <div key={trip.id} className="timeline-item">
-                                            <div className="timeline-dot"></div>
-                                            <div className="timeline-content">
-                                                <div className="item-main">
-                                                    <h4>{trip.route}</h4>
-                                                    <p>{trip.date} • {trip.driverName}</p>
-                                                </div>
-                                                <div className="item-actions">
-                                                    {(trip.fuel_bill_url || trip.maintenance_bill_url || trip.basket_bill_url) && (
-                                                        <div style={{ display: 'flex', gap: '4px', marginRight: '8px' }}>
-                                                            {trip.fuel_bill_url && (
-                                                                <a href={trip.fuel_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปน้ำมัน"><Camera size={14} /></a>
-                                                            )}
-                                                            {trip.maintenance_bill_url && (
-                                                                <a href={trip.maintenance_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปค่าซ่อม"><Camera size={14} /></a>
-                                                            )}
-                                                            {trip.basket_bill_url && (
-                                                                <a href={trip.basket_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปตะกร้า"><Camera size={14} /></a>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                    <button onClick={() => handleEdit(trip)} className="icon-btn-edit">
-                                                        <Edit size={16} />
-                                                    </button>
-                                                    <button onClick={() => handleDelete(trip.id)} className="icon-btn-delete">
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
+                            if (filtered.length > 0) {
+                                return filtered.map((trip) => (
+                                    <div key={trip.id} className="timeline-item">
+                                        <div className="timeline-dot"></div>
+                                        <div className="timeline-content">
+                                            <div className="item-main">
+                                                <h4>{trip.route}</h4>
+                                                <p>{trip.date} • {trip.driverName}</p>
+                                            </div>
+                                            <div className="item-actions">
+                                                {(trip.fuel_bill_url || trip.maintenance_bill_url || trip.basket_bill_url) && (
+                                                    <div style={{ display: 'flex', gap: '4px', marginRight: '8px' }}>
+                                                        {trip.fuel_bill_url && (
+                                                            <a href={trip.fuel_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปน้ำมัน"><Camera size={14} /></a>
+                                                        )}
+                                                        {trip.maintenance_bill_url && (
+                                                            <a href={trip.maintenance_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปค่าซ่อม"><Camera size={14} /></a>
+                                                        )}
+                                                        {trip.basket_bill_url && (
+                                                            <a href={trip.basket_bill_url} target="_blank" rel="noreferrer" className="bill-icon-btn" title="ดูรูปตะกร้า"><Camera size={14} /></a>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                <button onClick={() => handleEdit(trip)} className="icon-btn-edit">
+                                                    <Edit size={16} />
+                                                </button>
+                                                <button onClick={() => handleDelete(trip.id)} className="icon-btn-delete">
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
                                         </div>
-                                    ));
-                                } else {
-                                    return <div className="empty-history">ไม่พบประวัติงาน{formData.driverName ? `ของคุณ ${formData.driverName}` : ''}</div>;
-                                }
-                            })()}
-                        </div>
-                    )}
-                </div>
+                                    </div>
+                                ));
+                            } else {
+                                return <div className="empty-history">ไม่พบประวัติงาน{formData.driverName ? `ของคุณ ${formData.driverName}` : ''}</div>;
+                            }
+                        })()}
+                    </div>
+                )}
             </main>
 
             {showSlip && (
                 <SalarySlip
                     driverName={formData.driverName}
-                    trips={trips.filter(t => {
-                        const searchName = formData.driverName.trim().replace(/\s+/g, ' ');
-                        const startDate = new Date(slipYear, slipMonth - 1, 20);
-                        const endDate = new Date(slipYear, slipMonth, 19);
-                        const [y, m, d] = (t.date || '').split('-').map(Number);
-                        if (!y) return false;
-                        const checkDate = new Date(y, m - 1, d);
-                        return t.driverName === searchName && checkDate >= startDate && checkDate <= endDate;
-                    })}
+                    trips={filteredBillingTrips}
                     cnDeduction={cnDeductions[formData.driverName?.trim().replace(/\s+/g, ' ')] || 0}
                     onClose={() => setShowSlip(false)}
                     period={`20 ${['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'][(slipMonth - 1 + 12) % 12]} - 19 ${['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'][slipMonth]} ${slipYear}`}
                 />
+            )}
+
+            {showBillingDoc && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.85)', zIndex: 9999, overflowY: 'auto', padding: '2rem 1rem'
+                }}>
+                    <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
+                        <button
+                            onClick={() => setShowBillingDoc(false)}
+                            style={{
+                                position: 'absolute', right: '-10px', top: '-10px', zIndex: 10001,
+                                background: '#f43f5e', color: 'white', border: 'none',
+                                borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                            }}
+                        >
+                            <X size={20} />
+                        </button>
+                        <BillingSummary
+                            trips={filteredBillingTrips}
+                            currentMonth={slipMonth}
+                            currentYear={slipYear}
+                            driverName={formData.driverName.trim().replace(/\s+/g, ' ')}
+                            address={formData.driverName.includes("สมชาย") ? "279 ม.7 ต.ป่าสัก อ.เมือง ลำพูน 51000" : "เลขที่ 246 หมู่ 6 ต.เวียงตาล อ.ห้างฉัตร ลำปาง 52190"}
+                            isDriverCopy={true}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {showTripLog && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.85)', zIndex: 9999, overflowY: 'auto', padding: '2rem 1rem'
+                }}>
+                    <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
+                        <button
+                            onClick={() => setShowTripLog(false)}
+                            style={{
+                                position: 'absolute', right: '-10px', top: '-10px', zIndex: 10001,
+                                background: '#f43f5e', color: 'white', border: 'none',
+                                borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+                            }}
+                        >
+                            <X size={20} />
+                        </button>
+                        <DriverTripLog
+                            trips={filteredBillingTrips}
+                            currentMonth={slipMonth}
+                            currentYear={slipYear}
+                            driverName={formData.driverName.trim().replace(/\s+/g, ' ')}
+                            isDriverCopy={true}
+                        />
+                    </div>
+                </div>
             )}
 
             <style dangerouslySetInnerHTML={{
@@ -676,7 +835,7 @@ const DriverEntry = () => {
                  } 
 
             `}} />
-        </div>
+        </div >
     );
 };
 

@@ -79,7 +79,7 @@ const TripForm = ({ onAdd, onUpdate, uploadFile, routePresets, fetchPresets, ext
 
         if (count >= 101) {
             revenue = 1000;
-            share = 100;
+            share = 700;
         } else if (count >= 91) {
             revenue = 600;
             share = 400;

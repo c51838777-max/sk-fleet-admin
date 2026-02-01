@@ -9,6 +9,8 @@ import TripEditModal from '../components/TripEditModal';
 import { Truck, ArrowRight, Maximize2, Minimize2, Plus, ShoppingCart, Wallet, Banknote, Users, Fuel, Settings, CreditCard, DollarSign } from 'lucide-react';
 import FleetDashboard from '../components/FleetDashboard';
 import { logoBase64 } from '../assets/logoBase64';
+import BillingSummary from '../components/BillingSummary';
+import DriverTripLog from '../components/DriverTripLog';
 
 
 const Dashboard = () => {
@@ -37,6 +39,7 @@ const Dashboard = () => {
     const [viewMode, setViewMode] = useState('monthly'); // 'monthly' or 'all'
     const [isMaximized, setIsMaximized] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showBilling, setShowBilling] = useState(false);
     const formRef = useRef(null);
 
     const handleEditTrip = (trip) => {
@@ -108,6 +111,7 @@ const Dashboard = () => {
     const [viewType, setViewType] = useState('monthly'); // 'monthly' or 'yearly' for stats
 
     const tripsArray = viewMode === 'monthly' ? currentMonthTripsEnriched : trips;
+
 
     const monthNames = [
         'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
@@ -234,44 +238,50 @@ const Dashboard = () => {
                                     <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#38bdf8' }}>฿{stats.totalRevenue.toLocaleString()}</div>
                                 </div>
 
-                                {/* Row 1: ค่าเที่ยว - ค่าแรง */}
+                                {/* Row 1: จำนวนเที่ยว - ค่าเที่ยว */}
+                                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                                    <div style={{ fontSize: '0.7rem', opacity: 0.7, marginBottom: '2px' }}>จำนวนเที่ยว</div>
+                                    <div style={{ fontSize: '1rem', fontWeight: '700' }}>{stats.totalTrips} เที่ยว</div>
+                                </div>
                                 <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
                                     <div style={{ fontSize: '0.7rem', opacity: 0.7, marginBottom: '2px' }}>ค่าเที่ยว</div>
                                     <div style={{ fontSize: '1rem', fontWeight: '700' }}>฿{stats.totalPrice.toLocaleString()}</div>
                                 </div>
+
+                                {/* Row 2: ค่าแรง - ค่าตะกร้า */}
                                 <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
                                     <div style={{ fontSize: '0.7rem', opacity: 0.7, marginBottom: '2px' }}>ค่าแรง</div>
                                     <div style={{ fontSize: '1rem', fontWeight: '700' }}>฿{stats.totalWage.toLocaleString()}</div>
                                 </div>
-
-                                {/* Row 2: ค่าตะกร้า - ส่วนแบ่งตะกร้า */}
                                 <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
                                     <div style={{ fontSize: '0.7rem', opacity: 0.7, marginBottom: '2px' }}>ค่าตะกร้า</div>
                                     <div style={{ fontSize: '1rem', fontWeight: '700' }}>฿{stats.totalBasket.toLocaleString()}</div>
                                 </div>
+
+                                {/* Row 3: ส่วนแบ่งตะกร้า - น้ำมัน */}
                                 <div style={{ background: 'rgba(244, 63, 94, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
                                     <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#f43f5e' }}>ส่วนแบ่งตะกร้า</div>
                                     <div style={{ fontSize: '1rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalBasketShare.toLocaleString()}</div>
                                 </div>
-
-                                {/* Row 3: ค่าน้ำมัน - ค่าซ่อม */}
                                 <div style={{ background: 'rgba(244, 63, 94, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
                                     <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#f43f5e' }}>ค่าน้ำมัน</div>
                                     <div style={{ fontSize: '1rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalFuel.toLocaleString()}</div>
                                 </div>
+
+                                {/* Row 4: ค่าซ่อม - ยอดเบิก */}
                                 <div style={{ background: 'rgba(244, 63, 94, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(244, 63, 94, 0.2)' }}>
                                     <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#f43f5e' }}>ค่าซ่อม</div>
                                     <div style={{ fontSize: '1rem', fontWeight: '700', color: '#f43f5e' }}>฿{stats.totalMaintenance.toLocaleString()}</div>
                                 </div>
-
-                                {/* Row 4: ยอดเบิก - คงเหลือน้อง */}
                                 <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
                                     <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#f59e0b' }}>ยอด.เบิก</div>
                                     <div style={{ fontSize: '1rem', fontWeight: '700', color: '#f59e0b' }}>฿{stats.totalStaffAdvance.toLocaleString()}</div>
                                 </div>
-                                <div style={{ background: 'rgba(168, 85, 247, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
-                                    <div style={{ fontSize: '0.7rem', opacity: 0.9, marginBottom: '2px', color: '#a855f7' }}>คงเหลือน้อง</div>
-                                    <div style={{ fontSize: '1rem', fontWeight: '700', color: '#a855f7' }}>฿{stats.totalNetPay.toLocaleString()}</div>
+
+                                {/* Row 5: คงเหลือลูกน้อง */}
+                                <div style={{ gridColumn: '1 / -1', background: 'rgba(168, 85, 247, 0.1)', padding: '0.75rem 1rem', borderRadius: '12px', border: '1px solid rgba(168, 85, 247, 0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontSize: '0.9rem', color: '#a855f7', fontWeight: '600' }}>คงเหลือลูกน้อง</div>
+                                    <div style={{ fontSize: '1.2rem', fontWeight: '800', color: '#a855f7' }}>฿{stats.totalNetPay.toLocaleString()}</div>
                                 </div>
 
                                 {/* กำไรสุทธิ (Full Width) */}
@@ -315,6 +325,66 @@ const Dashboard = () => {
                 onDateChange={(val) => setFormDate({ value: val, ts: Date.now() })}
                 editingTrip={editingTrip}
             />
+
+            {/* Billing Summary grouped by Driver at the bottom */}
+            {Object.entries(
+                currentMonthTripsEnriched.reduce((acc, trip) => {
+                    let rawName = trip.driverName || trip.driver_name || 'ไม่ระบุชื่อ';
+                    let name = rawName.trim().replace(/\s+/g, ' ');
+                    // User Request: Specific change for Patta's display name
+                    if (name.includes('ภัทธา')) name = 'นางสาว ภัทธา เรืองวิลัย';
+
+                    if (!acc[name]) acc[name] = [];
+                    acc[name].push(trip);
+                    return acc;
+                }, {})
+            ).map(([driverName, driverTrips]) => (
+                <div key={driverName} style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginTop: '4rem', borderTop: '2px dashed #6366f1', paddingTop: '2rem' }}>
+                    <div style={{ padding: '0 2rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', color: '#6366f1', fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                            📊 รายละเอียดงานและสรุปยอด: {driverName}
+                        </h2>
+                    </div>
+
+                    {/* 1. Daily Trip Log - Notebook Style Breakdown */}
+                    <DriverTripLog
+                        trips={driverTrips}
+                        currentMonth={currentMonth}
+                        currentYear={currentYear}
+                        driverName={driverName}
+                        isDriverCopy={true}
+                    />
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <h3 style={{ fontSize: '1.1rem', color: '#000', fontWeight: '800', margin: '1rem 0' }}>
+                                🧾 ใบแจ้งยอด (สรุปตามเส้นทาง)
+                            </h3>
+                        </div>
+
+                        {/* 2. Office Copy - Always Patta's name for billing */}
+                        <BillingSummary
+                            trips={driverTrips}
+                            currentMonth={currentMonth}
+                            currentYear={currentYear}
+                            driverName="นางสาว ภัทธา เรืองวิลัย"
+                            address="เลขที่ 246 หมู่ 6 ต.เวียงตาล อ.ห้างฉัตร ลำปาง 52190"
+                            isDriverCopy={false}
+                            cnDeduction={cnDeductions['นางสาว ภัทธา เรืองวิลัย'] || 0}
+                        />
+                        {/* 3. Driver Copy - Shows actual driver's name */}
+                        <BillingSummary
+                            trips={driverTrips}
+                            currentMonth={currentMonth}
+                            currentYear={currentYear}
+                            driverName={driverName}
+                            address={driverName.includes("สมชาย") ? "279 ม.7 ต.ป่าสัก อ.เมือง ลำพูน 51000" : "เลขที่ 246 หมู่ 6 ต.เวียงตาล อ.ห้างฉัตร ลำปาง 52190"}
+                            isDriverCopy={true}
+                            cnDeduction={cnDeductions[driverName] || 0}
+                        />
+                    </div>
+                </div>
+            ))}
 
             {/* Floating Action Button for Adding in Maximized Mode */}
             {/* Floating Action Button - Always visible now */}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Truck, DollarSign, Fuel, Users, CreditCard, ShoppingCart, Settings, Wallet, Banknote, Undo2 } from 'lucide-react';
-import bgSrc from '../assets/admin-bg.png';
+import bgSrc from '../assets/admin-bg-premium.png';
 
 const StatCard = ({ title, value, icon: _Icon, color, subValue }) => {
     const getColorClass = () => {
@@ -71,12 +71,6 @@ const FleetDashboard = ({ stats, yearlyStats, isSupabaseReady, trips = [], curre
                     min-height: -webkit-fill-available;
                     display: flex; 
                     flex-direction: column; 
-                    background-color: #020617;
-                    background-image: 
-                        linear-gradient(to bottom, rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 0.8)),
-                        url(${bgSrc});
-                    background-size: cover;
-                    background-position: center;
                     padding: 1.5rem;
                     perspective: 2000px;
                     /* Fix for Sticky: Let the window handle scrolling, remove overflow constraint */

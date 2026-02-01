@@ -61,8 +61,21 @@ export const useTrips = () => {
     const [routePresets, setRoutePresets] = useState({});
     const [cnDeductions, setCnDeductions] = useState({});
     const [loading, setLoading] = useState(true);
-    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+    // Initial Month/Year logic: If day >= 20, it belongs to the NEXT billing month
+    const now = new Date();
+    let initialMonth = now.getMonth();
+    let initialYear = now.getFullYear();
+    if (now.getDate() >= 20) {
+        initialMonth += 1;
+        if (initialMonth > 11) {
+            initialMonth = 0;
+            initialYear += 1;
+        }
+    }
+
+    const [currentMonth, setCurrentMonth] = useState(initialMonth);
+    const [currentYear, setCurrentYear] = useState(initialYear);
     const [isSupabaseReady, setIsSupabaseReady] = useState(false);
 
     // Initialize Supabase Status
@@ -122,16 +135,12 @@ export const useTrips = () => {
 
         for (const suffix of suffixes) {
             try {
-                // Defensive check: if suffix is empty, we just fetch everything, but ilike '%' is standard
                 const query = supabase.from('route_presets').select('*');
-
-                // Only apply ilike if we have a reason to, or use a broad match
                 const { data, error } = await query.ilike('route_name', `%${suffix}`);
 
                 if (error) {
-                    // If 400, it might be a missing column. Let's try to just select everything as fallback.
                     if (error.code === '42703' || error.status === 400) {
-                        console.warn(`Column "route_name" might be missing in route_presets. Error: ${error.message}`);
+                        console.warn(`Column "route_name" might be missing in route_presets.`);
                     } else {
                         console.warn(`Supabase error for suffix "${suffix}":`, error.message);
                     }
@@ -140,7 +149,6 @@ export const useTrips = () => {
 
                 if (data && data.length > 0) {
                     data.forEach(p => {
-                        // Handle potential missing route_name in data
                         const rName = p.route_name || p.name || p.route || 'Unknown';
                         const cleanName = rName.replace(suffix, '').trim();
                         if (!finalPresets[cleanName]) {
@@ -288,16 +296,26 @@ export const useTrips = () => {
 
     // Logic to select correct trips for Month View Enriched
     const currentMonthTripsEnriched = useMemo(() => {
-        const startDate = new Date(currentYear, currentMonth - 1, 20);
-        const endDate = new Date(currentYear, currentMonth, 19);
-        const filtered = trips.filter(t => {
-            if (!t.date) return false;
-            const [y, m, d] = t.date.split('-').map(Number);
-            const checkDate = new Date(y, m - 1, d);
-            return checkDate >= startDate && checkDate <= endDate;
+        // Calculate bounds as YYYY-MM-DD strings for precise matching
+        const start = new Date(currentYear, currentMonth - 1, 20);
+        const end = new Date(currentYear, currentMonth, 19);
+
+        const startStr = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-20`;
+        const endStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-19`;
+
+        const filtered = trips.filter(t => t.date && t.date >= startStr && t.date <= endStr);
+
+        // Enrich with Presets if missing
+        return filtered.map(t => {
+            const enriched = { ...t };
+            const preset = routePresets[t.route.trim()];
+            if (preset) {
+                if (!enriched.price || enriched.price === 0) enriched.price = preset.price || 0;
+                if (!enriched.wage || enriched.wage === 0) enriched.wage = preset.wage || 0;
+            }
+            return enriched;
         });
-        return enrichTripsWithPresets(filtered);
-    }, [trips, currentMonth, currentYear]);
+    }, [trips, currentMonth, currentYear, routePresets]);
 
     const stats = useMemo(() => calculateStats(currentMonthTripsEnriched, cnDeductions), [currentMonthTripsEnriched, cnDeductions, calculateStats]);
     const yearlyStats = useMemo(() => {
